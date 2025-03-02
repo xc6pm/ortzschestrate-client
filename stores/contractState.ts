@@ -4,6 +4,8 @@ import type { Deployment } from "~/types/Deployment"
 import { config } from "~/web3/wagmiConfig"
 import { formatEther, type Abi } from "viem"
 
+const deploymentArtifact = import.meta.dev ? "/deployment/dev/ORTBet.json" : "/deployment/ORTBet.json"
+
 export const useContractStateStore = defineStore("contractStateStore", () => {
   const deployment = ref<Deployment | null>(null)
   const account = useAccount()
@@ -11,7 +13,7 @@ export const useContractStateStore = defineStore("contractStateStore", () => {
   const stakesEth = ref(0)
 
   const reload = async () => {
-    deployment.value = await $fetch<any>("/deployment/ORTBet.json")
+    deployment.value = await $fetch<any>(deploymentArtifact)
     return deployment.value
   }
 
