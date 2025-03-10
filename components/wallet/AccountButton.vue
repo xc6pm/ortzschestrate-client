@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAccount, useWriteContract } from "@wagmi/vue"
-import { parseEther } from "viem"
+import { parseEther, type Hex } from "viem"
 import type { FormError } from "@nuxt/ui/dist/runtime/types"
 import { useContractStateStore } from "~/stores/contractState"
 
@@ -52,7 +52,24 @@ const amountEntered = async () => {
   isModalOpen.value = false
 }
 
-const dropdownItems = [
+const userStore = useUserStore()
+const walletVerified = computed(() => account.address.value === (userStore.user?.verifiedWallet as Hex))
+const toast = useToast()
+
+const verifyWallet = async () => {
+  if (walletVerified.value) return
+  const fetchRes = await $fetch.raw(apiUrl("/wallet/verify"), {
+    params: { walletAddress: account.address.value },
+    method: "POST",
+    credentials: "include",
+  })
+  if (fetchRes.ok) {
+    toast.add({ description: "Wallet verified successfully", color: "green" })
+  }
+  await userStore.fetch()
+}
+
+const dropdownItems = ref([
   [
     {
       label: "deposit",
@@ -77,7 +94,25 @@ const dropdownItems = [
       },
     },
   ],
-]
+])
+
+const invalidateVerifyButton = () => {
+  if (!walletVerified.value) {
+    dropdownItems.value[0] = [
+      {
+        label: "verify",
+        click: () => verifyWallet(),
+      },
+      ...dropdownItems.value[0],
+    ]
+  } else if (dropdownItems.value[0].find((item) => item?.label === "verify")) {
+    dropdownItems.value[0].splice(0, 1)
+  }
+}
+
+watch(walletVerified, invalidateVerifyButton)
+
+invalidateVerifyButton()
 
 const errors = ref<FormError[]>([])
 const validate = (state: { amount: number }): FormError[] => {
