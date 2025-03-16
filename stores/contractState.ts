@@ -1,5 +1,5 @@
 import { useAccount } from "@wagmi/vue"
-import { readContract } from "@wagmi/core"
+import { readContract, watchContractEvent, type WatchContractEventReturnType } from "@wagmi/core"
 import type { Deployment } from "~/types/Deployment"
 import { config } from "~/web3/wagmiConfig"
 import { formatEther, type Abi } from "viem"
@@ -11,9 +11,32 @@ export const useContractStateStore = defineStore("contractStateStore", () => {
   const account = useAccount()
   const stakesWei = ref(0n)
   const stakesEth = ref(0)
+  let unwatchStakesDeposited: WatchContractEventReturnType | null = null
+
+  watch(deployment, (newValue, oldValue) => {
+    if (newValue?.address) {
+      unwatchStakesDeposited = watchContractEvent(config, {
+        strict: false,
+        abi: newValue.abi,
+        eventName: "StakesDeposited",
+        args: {
+          player: account.address.value,
+        },
+        syncConnectedChain: true,
+        onLogs(logs) {
+          console.log("logs", logs)
+          stakesWei.value += logs.reduce((cum, l) => cum + l.args!.amount, 0n)
+          stakesEth.value = parseFloat(formatEther(stakesWei.value))
+        },
+      })
+    } else {
+      if (unwatchStakesDeposited) unwatchStakesDeposited()
+    }
+  })
 
   const reload = async () => {
-    deployment.value = await $fetch<any>(deploymentArtifact)
+    const depl = await $fetch<Deployment>(deploymentArtifact)
+    deployment.value = Object.freeze(depl)
     return deployment.value
   }
 
