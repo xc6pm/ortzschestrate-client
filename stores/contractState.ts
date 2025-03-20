@@ -1,5 +1,5 @@
 import { useAccount } from "@wagmi/vue"
-import { readContract, watchContractEvent, type WatchContractEventReturnType } from "@wagmi/core"
+import { getBlockNumber, readContract, watchContractEvent, type WatchContractEventReturnType } from "@wagmi/core"
 import type { Deployment } from "~/types/Deployment"
 import { config } from "~/web3/wagmiConfig"
 import { formatEther, type Abi } from "viem"
@@ -11,26 +11,49 @@ export const useContractStateStore = defineStore("contractStateStore", () => {
   const account = useAccount()
   const stakesWei = ref(0n)
   const stakesEth = ref(0)
-  let unwatchStakesDeposited: WatchContractEventReturnType | null = null
+  let unwatchBalanceTrackingEvents: WatchContractEventReturnType[] = []
 
-  watch(deployment, (newValue, oldValue) => {
+  watch(deployment, async (newValue, oldValue) => {
     if (newValue?.address) {
-      unwatchStakesDeposited = watchContractEvent(config, {
-        strict: false,
-        abi: newValue.abi,
-        eventName: "StakesDeposited",
-        args: {
-          player: account.address.value,
-        },
-        syncConnectedChain: true,
-        onLogs(logs) {
-          console.log("logs", logs)
-          stakesWei.value += logs.reduce((cum, l) => cum + l.args!.amount, 0n)
-          stakesEth.value = parseFloat(formatEther(stakesWei.value))
-        },
-      })
+      await updateBalance()
+      const balanceCheckedOnBlockNumber = await getBlockNumber(config)
+      unwatchBalanceTrackingEvents.push(
+        watchContractEvent(config, {
+          strict: false,
+          abi: newValue.abi,
+          eventName: "StakesDeposited",
+          args: {
+            player: account.address.value,
+          },
+          syncConnectedChain: true,
+          fromBlock: balanceCheckedOnBlockNumber + 1n,
+          onLogs(logs) {
+            console.log("deposit logs", logs)
+            stakesWei.value += logs.reduce((cum, l) => cum + l.args!.amount, 0n)
+            stakesEth.value = parseFloat(formatEther(stakesWei.value))
+          },
+        })
+      )
+      unwatchBalanceTrackingEvents.push(
+        watchContractEvent(config, {
+          abi: newValue.abi,
+          eventName: "StakesWithdrawn",
+          args: {
+            player: account.address.value,
+          },
+          syncConnectedChain: true,
+          fromBlock: balanceCheckedOnBlockNumber + 1n,
+          onLogs(logs) {
+            console.log("withdraw logs", logs)
+            stakesWei.value -= logs.reduce((cum, l) => cum + l.args!.amount, 0n)
+            stakesEth.value = parseFloat(formatEther(stakesWei.value))
+          },
+        })
+      )
     } else {
-      if (unwatchStakesDeposited) unwatchStakesDeposited()
+      for (let unwatch of unwatchBalanceTrackingEvents) {
+        unwatch()
+      }
     }
   })
 
@@ -64,6 +87,7 @@ export const useContractStateStore = defineStore("contractStateStore", () => {
       functionName: "getBalance",
       args: [account.address.value],
     })
+
     stakesWei.value = data as bigint
     stakesEth.value = parseFloat(formatEther(stakesWei.value))
     return { stakesWei: stakesWei.value, stakesEth: stakesEth.value }
