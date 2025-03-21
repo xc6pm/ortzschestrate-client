@@ -2,7 +2,7 @@ import { useAccount } from "@wagmi/vue"
 import { getBlockNumber, readContract, watchContractEvent, type WatchContractEventReturnType } from "@wagmi/core"
 import type { Deployment } from "~/types/Deployment"
 import { config } from "~/web3/wagmiConfig"
-import { formatEther, type Abi } from "viem"
+import { formatEther, type Abi, type Log } from "viem"
 
 const deploymentArtifact = import.meta.dev ? "/deployment/dev/ORTBet.json" : "/deployment/ORTBet.json"
 
@@ -17,37 +17,54 @@ export const useContractStateStore = defineStore("contractStateStore", () => {
     if (newValue?.address) {
       await updateBalance()
       const balanceCheckedOnBlockNumber = await getBlockNumber(config)
+
+      const commonParameters = {
+        abi: newValue.abi,
+        address: newValue.address,
+        args: {
+          player: account.address.value,
+        },
+        fromBlock: balanceCheckedOnBlockNumber + 1n,
+        syncConnectedChain: true,
+      }
+      const incrementBalance = (logs: Log[]) => {
+        console.log("incrementing balance", logs)
+        stakesWei.value += logs.reduce((cum, l) => cum + l.args!.amount, 0n)
+        stakesEth.value = parseFloat(formatEther(stakesWei.value))
+      }
+      const deduceBalance = (logs: Log[]) => {
+        console.log("deducing balance", logs)
+        stakesWei.value -= logs.reduce((cum, l) => cum + l.args!.amount, 0n)
+        stakesEth.value = parseFloat(formatEther(stakesWei.value))
+      }
+
       unwatchBalanceTrackingEvents.push(
         watchContractEvent(config, {
-          strict: false,
-          abi: newValue.abi,
+          ...commonParameters,
           eventName: "StakesDeposited",
-          args: {
-            player: account.address.value,
-          },
-          syncConnectedChain: true,
-          fromBlock: balanceCheckedOnBlockNumber + 1n,
-          onLogs(logs) {
-            console.log("deposit logs", logs)
-            stakesWei.value += logs.reduce((cum, l) => cum + l.args!.amount, 0n)
-            stakesEth.value = parseFloat(formatEther(stakesWei.value))
-          },
+          onLogs: incrementBalance,
         })
       )
       unwatchBalanceTrackingEvents.push(
         watchContractEvent(config, {
-          abi: newValue.abi,
+          ...commonParameters,
+          eventName: "StakesUnlocked",
+          onLogs: incrementBalance,
+        })
+      )
+
+      unwatchBalanceTrackingEvents.push(
+        watchContractEvent(config, {
+          ...commonParameters,
           eventName: "StakesWithdrawn",
-          args: {
-            player: account.address.value,
-          },
-          syncConnectedChain: true,
-          fromBlock: balanceCheckedOnBlockNumber + 1n,
-          onLogs(logs) {
-            console.log("withdraw logs", logs)
-            stakesWei.value -= logs.reduce((cum, l) => cum + l.args!.amount, 0n)
-            stakesEth.value = parseFloat(formatEther(stakesWei.value))
-          },
+          onLogs: deduceBalance,
+        })
+      )
+      unwatchBalanceTrackingEvents.push(
+        watchContractEvent(config, {
+          ...commonParameters,
+          eventName: "StakesLocked",
+          onLogs: deduceBalance,
         })
       )
     } else {
