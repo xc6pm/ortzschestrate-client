@@ -19,6 +19,7 @@
     "@tanstack/vue-query": "^5.66.0",
     "@wagmi/vue": "^0.1.10",
     "nuxt": "^3.13.0",
+    "vercel": "^41.4.1",
     "viem": "^2.23.2",
     "vue": "latest",
     "vue-router": "latest",
