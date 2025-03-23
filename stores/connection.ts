@@ -11,7 +11,8 @@ export const useConnectionStore = defineStore("connectionStore", () => {
       return connection.value
     }
 
-    const server = process.env.NUXT_API_URL?.split("/api")[0]
+    const config = useRuntimeConfig()
+    const server = config.public.apiUrl.split("/api")[0]
 
     const conn = new signalr.HubConnectionBuilder()
       .withUrl(server + "/hubs/game")
