@@ -34,14 +34,17 @@ const tryRegister = async (event: FormSubmitEvent<any>) => {
         username: state.username,
       }),
       credentials: "include",
+      ignoreResponseError: true
     })
 
     if (res.status !== 200) {
-      if (res.status === 409) {
-        toast.add({ description: "User already exists!", color: "red", icon: "i-heroicons-x-circle" })
-      } else {
-        toast.add({ description: "Registration failed!", color: "red", icon: "i-heroicons-x-circle" })
-      }
+      toast.add({
+        title: "Registeration failed!",
+        description: await res._data?.detail,
+        color: "red",
+        timeout: 5000,
+        icon: "i-heroicons-x-circle",
+      })
       return
     }
 

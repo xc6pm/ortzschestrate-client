@@ -33,12 +33,14 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
         username: !enteredValueIsEmail ? state.emailOrUsername : "",
       }),
       credentials: "include",
+      ignoreResponseError: true,
     })
 
     if (res.status !== 200) {
       console.log("Login result:", res)
       toast.add({
-        description: "Login failed! Invalid credentials.",
+        title: "Login failed!",
+        description: await res._data?.detail,
         color: "red",
         timeout: 5000,
         icon: "i-heroicons-x-circle",
@@ -48,10 +50,9 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
 
     await userStore.fetch()
     await navigateTo("/")
-  } catch (ex) {
-    console.log("login exception:", ex)
+  } catch (ex: any) {
     toast.add({
-      description: "Login failed! Invalid credentials.",
+      title: "Login failed!",
       color: "red",
       timeout: 5000,
       icon: "i-heroicons-x-circle",
@@ -65,10 +66,10 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
 <template>
   <UForm @submit="tryLogin" class="px-3 pt-3" :state="state">
     <UFormGroup label="Email or username:" name="emailOrUsername" class="mb-3">
-      <UInput v-model="state.emailOrUsername" type="text" required autofocus :disabled="tryingLogin"/>
+      <UInput v-model="state.emailOrUsername" type="text" required autofocus :disabled="tryingLogin" />
     </UFormGroup>
     <UFormGroup label="Password:" name="password" class="mb-5">
-      <UInput v-model="state.password" type="password" required :disabled="tryingLogin"/>
+      <UInput v-model="state.password" type="password" required :disabled="tryingLogin" />
     </UFormGroup>
 
     <UButton type="submit" block class="mb-3" :loading="tryingLogin" size="lg">Login</UButton>
