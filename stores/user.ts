@@ -1,4 +1,4 @@
-export type User = { id: string; userName: string; email: string, verifiedWallet: string }
+export type User = { id: string; userName: string; email: string; verifiedWallet: string }
 
 export const useUserStore = defineStore("userStore", () => {
   const user = ref<User | null>(null)
@@ -7,7 +7,7 @@ export const useUserStore = defineStore("userStore", () => {
 
   const fetch = async () => {
     try {
-      const fetchResult = await $fetch<User>(config.public.apiUrl + "/auth/user", {
+      const fetchResult = await $fetch<User>(apiUrl("/auth/user"), {
         credentials: "include",
       })
       
