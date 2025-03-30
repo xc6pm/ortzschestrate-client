@@ -41,17 +41,17 @@ onUnmounted(() => {
     <!-- Features Section -->
     <section>
       <div class="grid md:grid-cols-3 gap-8 py-12">
-        <UCard :class="{ 'bg-transparent': imgLoaded }">
+        <UCard :class="`${imgLoaded ? 'bg-transparent ring-slate-300 divide-slate-300' : ''}`">
           <template #header>Nietzschean Strategy 🧠</template>
           <p>Master the art of willpower, risk, and reward in a game that’s more than just chess.</p>
         </UCard>
-        <UCard :class="{ 'bg-transparent': imgLoaded }">
+        <UCard :class="`${imgLoaded ? 'bg-transparent ring-slate-300 divide-slate-300' : ''}`">
           <template #header>Bet on Your Brilliance 💰</template>
           <p>Wager on your games and prove your dominance in a skill-based arena.</p>
         </UCard>
-        <UCard :class="{ 'bg-transparent': imgLoaded }">
+        <UCard :class="`${imgLoaded ? 'bg-transparent ring-slate-300 divide-slate-300' : ''}`">
           <template #header>AI & Fair Play ⚖️</template>
-          <p>A transparent, trust-based system powered by blockchain and AI analysis.</p>
+          <p>A transparent, trust-based system powered by blockchain.</p>
         </UCard>
       </div>
     </section>
@@ -80,6 +80,7 @@ onUnmounted(() => {
       <div class="py-6 text-center" :class="{ 'text-gray-300': imgLoaded }">
         <p>&copy; 2025 Nietzschess. All rights reserved.</p>
         <div class="flex justify-center gap-4 mt-2">
+          <ULink to="/terms" :class="{ 'text-gray-300': imgLoaded }">Terms of Service</ULink>
           <ULink to="/privacy" :class="{ 'text-gray-300': imgLoaded }">Privacy Policy</ULink>
         </div>
         <div class="flex justify-center gap-4 mt-4">
