@@ -17,14 +17,17 @@ onUnmounted(() => {
 <template>
   <div :class="{ 'text-slate-300': imgLoaded }">
     <!-- Background Image -->
-    <NuxtImg
-      class="fixed top-0 left-0 w-full h-screen bg-cover bg-center transition-all duration-700"
-      :class="{ 'blur-md': isBlurred }"
-      style="z-index: -1"
-      fit="inside"
-      src="/img/home-bg.png"
-      v-on:load="() => (imgLoaded = true)"
-    />
+    <div>
+      <NuxtImg
+        class="fixed top-0 left-0 transition-all duration-700 h-screen w-full object-cover"
+        :class="{ 'blur-md': isBlurred }"
+        style="z-index: -1"
+        quality="80"
+        preload
+        src="/img/home-bg.png"
+        v-on:load="() => (imgLoaded = true)"
+      />
+    </div>
 
     <!-- Hero Section -->
     <section>
@@ -50,8 +53,8 @@ onUnmounted(() => {
           <p>Wager on your games and prove your dominance in a skill-based arena.</p>
         </UCard>
         <UCard :class="`${imgLoaded ? 'bg-transparent ring-slate-300 divide-slate-300' : ''}`">
-          <template #header>AI & Fair Play ⚖️</template>
-          <p>A transparent, trust-based system powered by blockchain.</p>
+          <template #header>Blockchain Secure Bets 🔗</template>
+          <p>Bet with confidence—secure, verifiable, and tamper-proof on the blockchain.</p>
         </UCard>
       </div>
     </section>
