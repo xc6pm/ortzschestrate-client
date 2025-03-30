@@ -68,10 +68,10 @@ const tryRegister = async (event: FormSubmitEvent<any>) => {
       <UInput type="text" v-model="state.username" required :disabled="tryingRegister" />
     </UFormField>
     <UFormField label="Password:" name="password" class="mb-3">
-      <UInput type="text" v-model="state.password" required :disabled="tryingRegister" />
+      <UInput type="password" v-model="state.password" required :disabled="tryingRegister" />
     </UFormField>
     <UFormField label="Confirm Password:" name="confirmPassword" class="mb-5">
-      <UInput type="text" v-model="state.confirmedPassword" required :disabled="tryingRegister" />
+      <UInput type="password" v-model="state.confirmedPassword" required :disabled="tryingRegister" />
     </UFormField>
 
     <UButton type="submit" block size="lg" :loading="tryingRegister">Register</UButton>
