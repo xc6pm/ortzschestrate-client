@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useUserStore} from "~/stores/user"
+import { useUserStore } from "~/stores/user"
 
 let userStore = useUserStore()
 
@@ -27,7 +27,13 @@ const dropDownItems = [
 </script>
 
 <template>
-  <UDropdownMenu v-if="userStore.user" :items="dropDownItems" :popper="{placement: 'bottom-end'}">
-    <UButton :label="userStore.user.userName" trailing-icon="i-heroicons-chevron-down-solid" color="tertiary"/>
+  <UDropdownMenu v-if="userStore.user" :items="dropDownItems" :popper="{ placement: 'bottom-end' }">
+    <UButton
+      :label="userStore.user.userName"
+      trailing-icon="i-heroicons-chevron-down-solid"
+      color="tertiary"
+      class="text-slate-200"
+    />
   </UDropdownMenu>
+  <UButton v-else label="Login" color="tertiary" class="text-slate-300" to="/login" />
 </template>
