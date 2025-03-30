@@ -1,13 +1,15 @@
 export type Player = { userId: string; name: string }
+export type GameType = { name: string; value: number }
+export type PieceColor = { asChar: string; name: string; value: number }
 export type PendingGame = {
   creator: Player
-  gameType: string
-  creatorColor: string
+  gameType: GameType
+  creatorColor: PieceColor
 }
 
 export type Game = {
   color: string
-  opponent: string,
+  opponent: string
   timeInMilliseconds: number
 }
 

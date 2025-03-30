@@ -1,5 +1,11 @@
+<script setup lang="ts">
+import { NuxtLayout } from "#components"
+</script>
+
 <template>
-  <NuxtLayout>
-    <NuxtPage :page-key="route => route.fullPath"/>
-  </NuxtLayout>
+  <UApp>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </UApp>
 </template>

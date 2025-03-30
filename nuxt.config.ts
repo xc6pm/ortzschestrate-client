@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiUrl: process.env.NUXT_API_URL,
-      reownProjectId: process.env.REOWN_PROJECT_ID
+      reownProjectId: process.env.REOWN_PROJECT_ID,
     },
   },
 
@@ -34,10 +34,6 @@ export default defineNuxtConfig({
     },
   },
 
-  ui: {
-    safelistColors: ["oxford-blue", "fiord"],
-  },
-
   vue: {
     compilerOptions: {
       isCustomElement: (tag) => ["appkit-connect-button"].includes(tag),
@@ -45,6 +41,13 @@ export default defineNuxtConfig({
   },
 
   ssr: false,
+
   plugins: ["~/plugins/connectWallet.client.ts"],
   modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/icon"],
+  css: ["~/assets/css/main.css"],
+  ui: {
+    theme: {
+      colors: ["primary", "secondary", "tertiary", "info", "success", "warning", "error", "neutral"],
+    },
+  },
 })

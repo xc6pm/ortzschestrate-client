@@ -1,30 +1,51 @@
 <script setup lang="ts">
+import { UButton } from "#components"
+import type { TableColumn } from "@nuxt/ui"
 import type { PendingGame } from "~/types/Game"
 
 let userStore = useUserStore()
 
-const pendingGameFields = [
+const pendingGameFields: TableColumn<PendingGame>[] = [
   {
-    key: "creator",
-    label: "Opponent",
+    header: "Opponent",
+    cell: ({ row }) => row.original.creator.name,
   },
   {
-    key: "gameType",
-    label: "Time",
+    header: "Time",
+    cell: ({ row }) => row.original.gameType.name,
   },
   {
-    key: "color",
-    label: "Your Color",
+    header: "Your Color",
+    cell: ({ row }) =>
+      row.original.creator.userId === userStore.user?.id
+        ? row.original.creatorColor.asChar === "w"
+          ? "White"
+          : "Black"
+        : row.original.creatorColor.asChar === "w"
+        ? "Black"
+        : "White",
   },
   {
-    key: "actions",
+    id: "actions",
+    cell: ({ row }) =>
+      row.original.creator.userId !== userStore.user?.id
+        ? h(UButton, {
+            label: "Join",
+            onClick: () => joinGame(row.original.creator.userId),
+            class: "block ml-auto",
+          })
+        : h(UButton, {
+            label: "Cancel",
+            onClick: cancelGame,
+            class: "block ml-auto",
+          }),
   },
 ]
 
 const connectionStore = useConnectionStore()
 
 const pendingGamesFromServer: PendingGame[] = await connectionStore.invoke("getPending")
-const pendingGames = ref<PendingGame[]>(pendingGamesFromServer)
+const pendingGames = shallowRef<PendingGame[]>(pendingGamesFromServer)
 
 useConnectionEvent("NewGameCreated", (creator) => {
   console.log("new game created by ", creator)
@@ -53,39 +74,17 @@ const cancelGame = async () => {
 </script>
 
 <template>
-  <UCard :ui="{ body: { padding: 'p-0' } }" >
-    <h2 class="text-lg m-3 text-center">Join someone</h2>
+  <UCard>
+    <template #header>
+      <h2 class="text-lg text-center">Join someone</h2>
+    </template>
+
     <UTable
+      v-if="pendingGames && pendingGames.length"
+      :data="pendingGames"
       :columns="pendingGameFields"
-      :rows="pendingGames"
-      :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'No pending games.' }"
-    >
-      <template #creator-data="{ row }">
-        {{ row.creator.name }}
-      </template>
-      <template #gameType-data="{ row }">
-        {{ row.gameType.name }}
-      </template>
-      <template #color-data="{ row }">
-        {{
-          // Check if it's an own game. If it's not show the opposite color
-          row.creator.userId === userStore.user?.id
-            ? row.creatorColor.asChar === "w"
-              ? "white"
-              : "black"
-            : row.creatorColor.asChar === "w"
-            ? "black"
-            : "white"
-        }}
-      </template>
-      <template #actions-data="{ row }">
-        <UButton
-          v-if="row.creator.userId !== userStore.user?.id"
-          label="Join"
-          @click="() => joinGame(row.creator.userId)"
-        />
-        <UButton v-if="row.creator.userId === userStore.user?.id" label="Cancel" @click="cancelGame" />
-      </template>
-    </UTable>
+      class="flex-1"
+    />
+    <p class="text-center text-gray-500" v-else>No pending games.</p>
   </UCard>
 </template>

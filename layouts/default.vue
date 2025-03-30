@@ -7,20 +7,18 @@ const userStore = useUserStore()
 
 <template>
   <header class="bg-gray-800 text-white py-4 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-      <NuxtLink to="/"><span class="text-3xl font-bold text-green-400">ortzschestrate</span></NuxtLink>
+    <UContainer class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+      <NuxtLink to="/"><span class="text-3xl font-bold text-green-400">nietzschess</span></NuxtLink>
 
       <div class="relative flex flex-row">
         <WalletButton v-if="userStore.user" />
 
         <UserButton class="ml-2" />
       </div>
-    </div>
+    </UContainer>
   </header>
 
-  <UContainer :ui="{ padding: 'px-4', strategy: 'override' }">
+  <UContainer class="max-w-7xl mx-auto px-4">
     <slot />
   </UContainer>
-
-  <UNotifications />
 </template>

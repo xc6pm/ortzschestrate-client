@@ -20,14 +20,14 @@ const dropDownItems = [
   [
     {
       label: "log out",
-      click: tryLogout,
+      onSelect: tryLogout,
     },
   ],
 ]
 </script>
 
 <template>
-  <UDropdown v-if="userStore.user" :items="dropDownItems" :popper="{placement: 'bottom-end'}">
-    <UButton :label="userStore.user.userName" trailing-icon="i-heroicons-chevron-down-solid" color="oxford-blue"/>
-  </UDropdown>
+  <UDropdownMenu v-if="userStore.user" :items="dropDownItems" :popper="{placement: 'bottom-end'}">
+    <UButton :label="userStore.user.userName" trailing-icon="i-heroicons-chevron-down-solid" color="tertiary"/>
+  </UDropdownMenu>
 </template>

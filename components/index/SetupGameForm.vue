@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { FormError } from "@nuxt/ui/dist/runtime/types"
+import type { FormError } from "@nuxt/ui"
 import { useContractStateStore } from "~/stores/contractState"
 
 const gameTimes = [
-  { name: "Rapid", value: 10 },
-  { name: "Blitz", value: 5 },
-  { name: "Bullet", value: 3 },
+  { label: "Rapid", value: 10 },
+  { label: "Blitz", value: 5 },
+  { label: "Bullet", value: 3 },
 ]
 const colors = [
-  { name: "White", value: "w" },
-  { name: "Black", value: "b" },
+  { label: "White", value: "w" },
+  { label: "Black", value: "b" },
 ]
 
 const minStakeAmount = 0.0003
@@ -29,14 +29,14 @@ const createGame = async () => {
   console.log("create invoked")
 }
 
-const validate = (state: { wagered: boolean; stake: number }): FormError[] => {
+const validate = (state: Partial<{ wagered: boolean; stake: number }>): FormError<string>[] => {
   if (state.wagered) {
-    if (state.stake <= 0)
-      return [{ path: "stake", message: "Must specify a stake amount greater than " + minStakeAmount }]
-    else if (state.stake > contractState.stakesEth)
-      return [{ path: "stake", message: `Cannot specify that amount. You have ${contractState.stakesEth} ETH.` }]
-  } else if (state.stake > 0) {
-    return [{ path: "stake", message: "Can't specify stake when the game is non-wagered." }]
+    if (state.stake! <= 0)
+      return [{ name: "stake", message: "Must specify a stake amount greater than " + minStakeAmount }]
+    else if (state.stake! > contractState.stakesEth)
+      return [{ name: "stake", message: `Cannot specify that amount. You have ${contractState.stakesEth} ETH.` }]
+  } else if (state.stake! > 0) {
+    return [{ name: "stake", message: "Can't specify stake when the game is non-wagered." }]
   }
 
   return []
@@ -44,37 +44,39 @@ const validate = (state: { wagered: boolean; stake: number }): FormError[] => {
 </script>
 
 <template>
-  <UCard :ui="{ body: { padding: 'p-3' }, strategy: 'override' }">
-    <h2 class="text-lg text-center">Setup a board</h2>
+  <UCard :ui="{ body: 'padding: p-3' }">
+    <template #header>
+      <h2 class="text-lg text-center">Setup a board</h2>
+    </template>
     <UForm :state="newGame" @submit.prevent="createGame" :validate="validate">
-      <UFormGroup label="Game Type:" name="time" class="my-3">
+      <UFormField label="Time:" name="time" class="my-3">
         <USelectMenu
-          :options="gameTimes"
+          :items="gameTimes"
           v-model="newGame.time"
-          option-attribute="name"
-          value-attribute="value"
-          placeholder="Game Type"
+          value-key="value"
+          placeholder="Time"
           required
+          :search-input="false"
         />
-      </UFormGroup>
-      <UFormGroup label="Color:" name="color" class="my-3">
+      </UFormField>
+      <UFormField label="Color:" name="color" class="my-3">
         <USelectMenu
-          :options="colors"
+          :items="colors"
           v-model="newGame.color"
-          option-attribute="name"
-          value-attribute="value"
+          value-key="value"
           placeholder="Color"
           required
+          :search-input="false"
         />
-      </UFormGroup>
+      </UFormField>
 
-      <UFormGroup class="my-3" name="wagered" v-if="contractState.account.isConnected">
+      <UFormField class="my-3" name="wagered" v-if="contractState.account.isConnected">
         <UCheckbox v-model="newGame.wagered" label="Wagered" />
-      </UFormGroup>
+      </UFormField>
 
-      <UFormGroup label="Stake:" name="stake" class="my-3" v-if="contractState.account.isConnected && newGame.wagered">
+      <UFormField label="Stake:" name="stake" class="my-3" v-if="contractState.account.isConnected && newGame.wagered">
         <UInput type="number" v-model="newGame.stake" />
-      </UFormGroup>
+      </UFormField>
 
       <UButton type="submit" class="mb-3" block>Create</UButton>
     </UForm>

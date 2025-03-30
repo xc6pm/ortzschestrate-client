@@ -20,7 +20,7 @@ const tryRegister = async (event: FormSubmitEvent<any>) => {
   event.preventDefault()
 
   if (state.password !== state.confirmedPassword) {
-    toast.add({ description: "Retype your passwords", color: "red", icon: "i-heroicons-x-circle" })
+    toast.add({ description: "Retype your passwords", color: "error", icon: "i-heroicons-x-circle" })
     return
   }
 
@@ -34,15 +34,15 @@ const tryRegister = async (event: FormSubmitEvent<any>) => {
         username: state.username,
       }),
       credentials: "include",
-      ignoreResponseError: true
+      ignoreResponseError: true,
     })
 
     if (res.status !== 200) {
       toast.add({
         title: "Registeration failed!",
         description: await res._data?.detail,
-        color: "red",
-        timeout: 5000,
+        color: "error",
+        duration: 5000,
         icon: "i-heroicons-x-circle",
       })
       return
@@ -52,7 +52,7 @@ const tryRegister = async (event: FormSubmitEvent<any>) => {
     await navigateTo("/")
   } catch (ex) {
     console.log("register exception:", ex)
-    toast.add({ description: "Registration failed!", color: "red", icon: "i-heroicons-x-circle" })
+    toast.add({ description: "Registration failed!", color: "error", icon: "i-heroicons-x-circle" })
   } finally {
     tryingRegister.value = false
   }
@@ -60,19 +60,19 @@ const tryRegister = async (event: FormSubmitEvent<any>) => {
 </script>
 
 <template>
-  <UForm @submit="tryRegister" :state="state" class="px-3 pt-3">
-    <UFormGroup label="Email:" name="email" class="mb-3">
+  <UForm @submit="tryRegister" :state="state" class="px-5 pt-3 pb-5">
+    <UFormField label="Email:" name="email" class="mb-3">
       <UInput type="email" autofocus v-model="state.email" required :disabled="tryingRegister" />
-    </UFormGroup>
-    <UFormGroup label="Username:" name="username" class="mb-3">
+    </UFormField>
+    <UFormField label="Username:" name="username" class="mb-3">
       <UInput type="text" v-model="state.username" required :disabled="tryingRegister" />
-    </UFormGroup>
-    <UFormGroup label="Password:" name="password" class="mb-3">
+    </UFormField>
+    <UFormField label="Password:" name="password" class="mb-3">
       <UInput type="text" v-model="state.password" required :disabled="tryingRegister" />
-    </UFormGroup>
-    <UFormGroup label="Confirm Password:" name="confirmPassword" class="mb-5">
+    </UFormField>
+    <UFormField label="Confirm Password:" name="confirmPassword" class="mb-5">
       <UInput type="text" v-model="state.confirmedPassword" required :disabled="tryingRegister" />
-    </UFormGroup>
+    </UFormField>
 
     <UButton type="submit" block size="lg" :loading="tryingRegister">Register</UButton>
   </UForm>

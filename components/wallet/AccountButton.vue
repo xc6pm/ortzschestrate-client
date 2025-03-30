@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { FormError } from "@nuxt/ui"
 import { useAccount, useWriteContract } from "@wagmi/vue"
 import { parseEther, type Hex } from "viem"
-import type { FormError } from "@nuxt/ui/dist/runtime/types"
 import { useContractStateStore } from "~/stores/contractState"
 
 const account = useAccount()
@@ -64,7 +64,7 @@ const verifyWallet = async () => {
     credentials: "include",
   })
   if (fetchRes.ok) {
-    toast.add({ description: "Wallet verified successfully", color: "green" })
+    toast.add({ description: "Wallet verified successfully" })
   }
   await userStore.fetch()
 }
@@ -73,7 +73,7 @@ const dropdownItems = ref([
   [
     {
       label: "deposit",
-      click: () => {
+      onSelect: () => {
         modalState.amount = 0
         isDepositModal = true
         isModalOpen.value = true
@@ -81,7 +81,7 @@ const dropdownItems = ref([
     },
     {
       label: "withdraw",
-      click: () => {
+      onSelect: () => {
         modalState.amount = 0
         isDepositModal = false
         isModalOpen.value = true
@@ -89,7 +89,7 @@ const dropdownItems = ref([
     },
     {
       label: "disconnect",
-      click: () => {
+      onSelect: () => {
         wagmiAdapter.disconnect()
       },
     },
@@ -101,7 +101,7 @@ const invalidateVerifyButton = () => {
     dropdownItems.value[0] = [
       {
         label: "verify",
-        click: () => verifyWallet(),
+        onSelect: () => verifyWallet(),
       },
       ...dropdownItems.value[0],
     ]
@@ -114,10 +114,11 @@ watch(walletVerified, invalidateVerifyButton)
 
 invalidateVerifyButton()
 
-const errors = ref<FormError[]>([])
-const validate = (state: { amount: number }): FormError[] => {
+const errors = ref<FormError<string>[]>([])
+const validate = (state: Partial<{ amount: number }>): FormError<string>[] => {
   const minimumAmount = 0.0001
-  if (state.amount < minimumAmount) errors.value = [{ path: "amount", message: `The minimum is ${minimumAmount} ETH.` }]
+  if (state.amount! < minimumAmount)
+    errors.value = [{ name: "amount", message: `The minimum is ${minimumAmount} ETH.` }]
   else errors.value = []
   return errors.value
 }
@@ -126,24 +127,42 @@ validate(modalState)
 </script>
 
 <template>
-  <UDropdown :items="dropdownItems">
-    <UButton color="oxford-blue">
+  <UDropdownMenu :items="dropdownItems">
+    <UButton color="tertiary">
       {{ account.address.value?.substring(0, 5) }}...{{
         account.address.value?.substring(account.address.value.length - 4, account.address.value.length)
       }}
       ({{ contractState.stakesEth }} ETH)
     </UButton>
-  </UDropdown>
+  </UDropdownMenu>
 
-  <UModal v-model="isModalOpen">
-    <UCard>
-      <UForm :state="modalState" :validate="validate">
-        <UFormGroup label="Amount" name="amount">
-          <UInput v-model="modalState.amount" type="number" />
-        </UFormGroup>
-        <UButton type="submit" @click="amountEntered" block class="mt-3"> Submit </UButton>
-        <UButton type="cancel" @click="() => (isModalOpen = false)" block class="mt-3" color="white"> Cancel </UButton>
-      </UForm>
-    </UCard>
+  <UModal v-model:open="isModalOpen">
+    <template #content>
+      <UCard>
+        <template #header>
+          <p>Enter Amount</p>
+        </template>
+        <UForm :state="modalState" :validate="validate">
+          <UFormField label="Amount" name="amount">
+            <UInput v-model="modalState.amount" type="number" />
+          </UFormField>
+          <UButton type="submit" @click="amountEntered" block class="mt-3"> Submit </UButton>
+          <UButton
+            type="reset"
+            @click="
+              () => {
+                isModalOpen = false
+              }
+            "
+            block
+            class="mt-3"
+            color="neutral"
+            variant="outline"
+          >
+            Cancel
+          </UButton>
+        </UForm>
+      </UCard>
+    </template>
   </UModal>
 </template>

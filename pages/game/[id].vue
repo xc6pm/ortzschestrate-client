@@ -13,7 +13,7 @@ const game: Game = await connectionStore.invoke("getGame", gameId)
 console.log("got game", game)
 if (!game) {
   const toast = useToast()
-  toast.add({ description: "Couldn't find that game!", color: "red" })
+  toast.add({ description: "Couldn't find that game!", color: "error" })
   navigateTo("/")
 }
 
@@ -125,15 +125,24 @@ const playerTimedOut = () => {
     </UCard>
   </section>
 
-  <UModal v-model="resultModal.isOpen">
-    <UCard>
-      <h1 class="text-4xl text-center">{{ resultModal.playerPOVResult }}</h1>
-      <h4 class="text-sm text-slate-200 text-center">{{ resultModal.reason }}</h4>
+  <UModal v-model:open="resultModal.isOpen">
+    <template #content>
+      <UCard>
+        <h1 class="text-4xl text-center">{{ resultModal.playerPOVResult }}</h1>
+        <h4 class="text-sm text-slate-300 text-center">{{ resultModal.reason }}</h4>
 
-      <UButton to="/" block size="lg" class="m-3 ml-0">Back to lobby</UButton>
-      <UButton @click="() => (resultModal.isOpen = false)" block size="lg" class="m-3 mb-0 ml-0"
-        >See what happened</UButton
-      >
-    </UCard>
+        <UButton to="/" block size="lg" class="m-3 ml-0">Back to lobby</UButton>
+        <UButton
+          @click="
+            () => {
+              resultModal.isOpen = false
+            }
+          "
+          block
+          size="lg"
+          >See what happened</UButton
+        >
+      </UCard>
+    </template>
   </UModal>
 </template>

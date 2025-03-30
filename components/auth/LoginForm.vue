@@ -41,8 +41,8 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
       toast.add({
         title: "Login failed!",
         description: await res._data?.detail,
-        color: "red",
-        timeout: 5000,
+        color: "error",
+        duration: 5000,
         icon: "i-heroicons-x-circle",
       })
       return
@@ -53,8 +53,8 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
   } catch (ex: any) {
     toast.add({
       title: "Login failed!",
-      color: "red",
-      timeout: 5000,
+      color: "error",
+      duration: 5000,
       icon: "i-heroicons-x-circle",
     })
   } finally {
@@ -64,17 +64,19 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
 </script>
 
 <template>
-  <UForm @submit="tryLogin" class="px-3 pt-3" :state="state">
-    <UFormGroup label="Email or username:" name="emailOrUsername" class="mb-3">
+  <UForm @submit="tryLogin" class="px-5 pt-3 py-5" :state="state">
+    <UFormField label="Email or username:" name="emailOrUsername" class="mb-3">
       <UInput v-model="state.emailOrUsername" type="text" required autofocus :disabled="tryingLogin" />
-    </UFormGroup>
-    <UFormGroup label="Password:" name="password" class="mb-5">
+    </UFormField>
+    <UFormField label="Password:" name="password" class="mb-5">
       <UInput v-model="state.password" type="password" required :disabled="tryingLogin" />
-    </UFormGroup>
+    </UFormField>
 
     <UButton type="submit" block class="mb-3" :loading="tryingLogin" size="lg">Login</UButton>
 
-    <UButton :to="googleLoginUrl" color="white" block :disabled="tryingLogin" size="lg">Login with Google</UButton>
+    <UButton :to="googleLoginUrl" color="neutral" variant="outline" block :disabled="tryingLogin" size="lg"
+      >Login with Google</UButton
+    >
   </UForm>
 </template>
 
