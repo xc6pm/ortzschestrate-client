@@ -41,7 +41,7 @@
 }
 
 .dark {
-  --ui-primary: var(--color-shamrock);
+  --ui-primary: var(--color-shamrock-500);
   --ui-secondary: var(--ui-color-secondary-400);
   --ui-tertiary: var(--color-oxford-blue);
   --ui-success: var(--ui-color-success-400);
