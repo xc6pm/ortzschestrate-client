@@ -12,6 +12,7 @@
   "dependencies": {
     "@microsoft/signalr": "^8.0.7",
     "@nuxt/icon": "^1.10.3",
+    "@nuxt/image": "1.10.0",
     "@nuxt/ui": "^3.0.2",
     "@pinia/nuxt": "^0.7.0",
     "@reown/appkit": "^1.6.8",

@@ -43,7 +43,7 @@ export default defineNuxtConfig({
   ssr: false,
 
   plugins: ["~/plugins/connectWallet.client.ts"],
-  modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/icon"],
+  modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/icon", "@nuxt/image"],
   css: ["~/assets/css/main.css"],
   ui: {
     theme: {

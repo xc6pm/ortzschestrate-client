@@ -42,5 +42,5 @@
   <h3>6. Contact Us</h3>
   <p>For privacy-related inquiries, you can reach us at:</p>
   <p><strong>Email:</strong> <a href="mailto:h.ebrahimi3319@gmail.com">h.ebrahimi3319@gmail.com</a></p>
-  <p><strong>Email:</strong> <a href="mailto:h.ebr141@gmail.com">h.ebr141@gmail.com</a></p>
+  <p class="mb-5"><strong>Email:</strong> <a href="mailto:h.ebr141@gmail.com">h.ebr141@gmail.com</a></p>
 </template>
