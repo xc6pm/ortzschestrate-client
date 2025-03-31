@@ -128,7 +128,7 @@ validate(modalState)
 
 <template>
   <UDropdownMenu :items="dropdownItems">
-    <UButton color="tertiary">
+    <UButton color="tertiary" class="text-slate-200">
       {{ account.address.value?.substring(0, 5) }}...{{
         account.address.value?.substring(account.address.value.length - 4, account.address.value.length)
       }}
