@@ -5,15 +5,15 @@ export const useUserStore = defineStore("userStore", () => {
 
   const fetch = async () => {
     try {
-      const fetchResult = await $fetch<User>(apiUrl("/auth/user"), {
+      const fetchResult = await $fetch<User>("/api/auth/user", {
         credentials: "include",
       })
 
       if (fetchResult) {
         user.value = Object.freeze(fetchResult)
       }
-    } catch (error) {
-      if (error.message.includes("401")) {
+    } catch (error: any) {
+      if (error.message?.includes("401")) {
         user.value = null
       }
     }

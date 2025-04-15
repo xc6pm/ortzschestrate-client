@@ -3,11 +3,7 @@ import type { FormSubmitEvent } from "#ui/types"
 
 const config = useRuntimeConfig()
 
-const loginUrl = apiUrl("/auth/login")
-const googleLoginUrl =
-  config.public.apiUrl +
-  "/auth/google?" +
-  new URLSearchParams({ redirect: window.location.protocol + "//" + window.location.host })
+const loginUrl = "/api/auth/login"
 
 const state = reactive({
   emailOrUsername: "",
@@ -61,6 +57,12 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
     tryingLogin.value = false
   }
 }
+
+const { signIn } = await useAuth()
+
+const tryGoogleLogin = async () => {
+  await signIn()
+}
 </script>
 
 <template>
@@ -74,7 +76,7 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
 
     <UButton type="submit" block class="mb-3" :loading="tryingLogin" size="lg">Login</UButton>
 
-    <UButton :to="googleLoginUrl" color="neutral" variant="outline" block :disabled="tryingLogin" size="lg"
+    <UButton @click="tryGoogleLogin" color="neutral" variant="outline" block :disabled="tryingLogin" size="lg"
       >Login with Google</UButton
     >
   </UForm>

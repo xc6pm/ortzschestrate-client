@@ -13,7 +13,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiUrl: process.env.NUXT_API_URL,
+      serverAddress: process.env.SERVER_ADDRESS,
       reownProjectId: process.env.REOWN_PROJECT_ID,
     },
   },
@@ -21,7 +21,7 @@ export default defineNuxtConfig({
   nitro: {
     devProxy: {
       "/api/**": {
-        target: `${process.env.NUXT_API_URL}/**`,
+        target: `${process.env.SERVER_ADDRESS}/**`,
         secure: true,
       },
     },
@@ -40,10 +40,29 @@ export default defineNuxtConfig({
     },
   },
 
+  oauth: {
+    endpoints: {
+      authorization: "https://accounts.google.com/o/oauth2/v2/auth",
+      token: "/api/auth/google-token",
+      userInfo: "/api/auth/user",
+      logout: "/api/auth/logout",
+    },
+    redirect: {
+      callback: "/google-cb",
+      logout: "/api/auth/logout",
+    },
+    clientId: "284791964116-hrdb5qr6a3g2beraffjuqjfhfed1odtu.apps.googleusercontent.com",
+    scope: [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "openid",
+    ],
+  },
+
   ssr: false,
 
   plugins: ["~/plugins/connectWallet.client.ts"],
-  modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/icon", "@nuxt/image"],
+  modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/icon", "@nuxt/image", "@xc6pm/nuxt-oauth"],
   css: ["~/assets/css/main.css"],
   ui: {
     theme: {

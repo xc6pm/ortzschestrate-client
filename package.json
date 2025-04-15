@@ -1,5 +1,5 @@
 {
-  "name": "client-app",
+  "name": "ortzschestrate-client",
   "private": true,
   "type": "module",
   "scripts": {
@@ -27,6 +27,7 @@
     "vue3-chessboard": "^1.3.3"
   },
   "devDependencies": {
+    "@xc6pm/nuxt-oauth": "^2.0.5-test.9",
     "typescript": "^5.8.2"
   }
 }

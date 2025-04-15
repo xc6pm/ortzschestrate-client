@@ -58,7 +58,7 @@ const toast = useToast()
 
 const verifyWallet = async () => {
   if (walletVerified.value) return
-  const fetchRes = await $fetch.raw(apiUrl("/wallet/verify"), {
+  const fetchRes = await $fetch.raw("/api/wallet/verify", {
     params: { walletAddress: account.address.value },
     method: "POST",
     credentials: "include",

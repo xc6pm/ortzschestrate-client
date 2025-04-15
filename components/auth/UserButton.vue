@@ -6,7 +6,7 @@ let userStore = useUserStore()
 await userStore.fetch()
 
 const tryLogout = async () => {
-  await $fetch(apiUrl("/auth/logout"), {
+  await $fetch("/api/auth/logout", {
     method: "POST",
     credentials: "include",
   })

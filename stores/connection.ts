@@ -11,13 +11,7 @@ export const useConnectionStore = defineStore("connectionStore", () => {
       return connection.value
     }
 
-    const config = useRuntimeConfig()
-    const server = config.public.apiUrl.split("/api")[0]
-
-    const conn = new signalr.HubConnectionBuilder()
-      .withUrl(server + "/hubs/game")
-      .withAutomaticReconnect()
-      .build()
+    const conn = new signalr.HubConnectionBuilder().withUrl("/hubs/game").withAutomaticReconnect().build()
 
     await conn.start()
 

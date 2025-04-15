@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "#ui/types"
 
-const config = useRuntimeConfig()
-
-const registerUrl = config.public.apiUrl + "/auth/register"
+const registerUrl = "/api/auth/register"
 
 const state = reactive({
   email: "",
