@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { BoardApi, TheChessboard, type BoardConfig } from "vue3-chessboard"
 import "vue3-chessboard/style.css"
-import type { Game, GameResult, GameUpdate } from "~/types/Game"
+import type { OngoingGame, GameResult, GameUpdate } from "~/types/Game"
 
 const route = useRoute()
 const gameId = route.params.id
@@ -9,7 +9,7 @@ const gameId = route.params.id
 const userStore = useUserStore()
 const connectionStore = useConnectionStore()
 
-const game: Game = await connectionStore.invoke("getGame", gameId)
+const game: OngoingGame = await connectionStore.invoke("getGame", gameId)
 console.log("got game", game)
 if (!game) {
   const toast = useToast()
@@ -88,6 +88,10 @@ const playerTimedOut = () => {
     }
   }, 1000)
 }
+
+const resign = async () => {
+  await connectionStore.invoke("resignShortGame")
+}
 </script>
 
 <template>
@@ -97,7 +101,7 @@ const playerTimedOut = () => {
         <span>{{ game.opponent }}</span>
         <ChessTimer
           :run="!isPlayersTurn"
-          :duration="game.timeInMilliseconds"
+          :duration="game.opponentRemainingTime"
           ref="opponentTimer"
           @timeout="playerTimedOut"
         />
@@ -114,10 +118,13 @@ const playerTimedOut = () => {
 
     <UCard id="playerCard" class="my-2 mx-auto w-full max-w-full landscape:max-w-[700px]">
       <div class="flex justify-between">
-        <span>{{ userStore.user?.userName }}</span>
+        <span
+          >{{ userStore.user?.userName }}
+          <UButton @click="resign" color="neutral" variant="outline">Resign</UButton></span
+        >
         <ChessTimer
           :run="isPlayersTurn"
-          :duration="game.timeInMilliseconds"
+          :duration="game.playerRemainingTime"
           ref="playerTimer"
           @timeout="playerTimedOut"
         />

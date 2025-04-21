@@ -7,10 +7,14 @@ export type PendingGame = {
   creatorColor: PieceColor
 }
 
-export type Game = {
+export type OngoingGame = {
+  id: string
   color: string
   opponent: string
   timeInMilliseconds: number
+  playerRemainingTime: number
+  opponentRemainingTime: number
+  stakeEth: number
 }
 
 export type GameEnding =
