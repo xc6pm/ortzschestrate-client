@@ -68,9 +68,11 @@ useAcknowledgeableEvent("OpponentReconnected", () => {
 })
 
 const resultModal = reactive({ isOpen: false, playerPOVResult: "", reason: "" })
+const gameEnded = ref(false)
 
 useAcknowledgeableEvent("GameEnded", (res: GameResult) => {
   console.log("game ended", res)
+  gameEnded.value = true
   boardConfig.viewOnly = true
   if (res.wonSide) {
     const playerWon = res.wonSide === game.color
@@ -125,7 +127,7 @@ const resign = async () => {
           ></span
         >
         <ChessTimer
-          :run="!isPlayersTurn"
+          :run="!isPlayersTurn && !gameEnded"
           :duration="game.opponentRemainingTime"
           ref="opponentTimer"
           @timeout="playerTimedOut"
@@ -148,7 +150,7 @@ const resign = async () => {
           <UButton @click="resign" color="neutral" variant="outline">Resign</UButton></span
         >
         <ChessTimer
-          :run="isPlayersTurn"
+          :run="isPlayersTurn && !gameEnded"
           :duration="game.playerRemainingTime"
           ref="playerTimer"
           @timeout="playerTimedOut"
