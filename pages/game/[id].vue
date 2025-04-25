@@ -47,6 +47,25 @@ useConnectionEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
   isPlayersTurn.value = true
 })
 
+const secondsTillOpponentAutoResign = ref(-1)
+
+useConnectionEvent("OpponentConnectionLost", (reconnectionTimeout) => {
+  console.log("Opponent connection lost")
+  secondsTillOpponentAutoResign.value = reconnectionTimeout / 1000
+  const intervalId = setInterval(() => {
+    if (secondsTillOpponentAutoResign.value <= -1) {
+      clearInterval(intervalId)
+      return
+    }
+    secondsTillOpponentAutoResign.value--
+  }, 1000)
+})
+
+useConnectionEvent("OpponentReconnected", () => {
+  console.log("Opponent reconnected")
+  secondsTillOpponentAutoResign.value = -1
+})
+
 const resultModal = reactive({ isOpen: false, playerPOVResult: "", reason: "" })
 
 useConnectionEvent("GameEnded", (res: GameResult) => {
@@ -98,7 +117,12 @@ const resign = async () => {
   <section class="h-[90svh] flex flex-col justify-between content-between">
     <UCard id="opponentCard" class="my-2 mx-auto w-full max-w-full landscape:max-w-[700px]">
       <div class="flex flex-row justify-between">
-        <span>{{ game.opponent }}</span>
+        <span
+          >{{ game.opponent }}
+          <span v-if="secondsTillOpponentAutoResign !== -1" class="text-xs"
+            >Disconnected, will auto-resign in {{ secondsTillOpponentAutoResign }}</span
+          ></span
+        >
         <ChessTimer
           :run="!isPlayersTurn"
           :duration="game.opponentRemainingTime"
