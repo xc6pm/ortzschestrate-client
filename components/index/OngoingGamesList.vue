@@ -7,11 +7,11 @@ const connection = useConnectionStore()
 
 ongoingShortGame.value = await connection.invoke("ongoingShortGame")
 
-useConnectionEvent("GameStarted", async (gameId) => {
+useAcknowledgeableEvent("GameStarted", async (gameId) => {
   ongoingShortGame.value = await connection.invoke("ongoingShortGame")
 })
 
-useConnectionEvent("GameEnded", async (gameResult) => {
+useAcknowledgeableEvent("GameEnded", async (gameResult) => {
   ongoingShortGame.value = await connection.invoke("ongoingShortGame")
 })
 

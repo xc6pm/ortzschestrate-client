@@ -56,7 +56,7 @@ useConnectionEvent("LobbyUpdated", (updatedPendingGames: PendingGame[]) => {
   pendingGames.value = updatedPendingGames
 })
 
-useConnectionEvent("GameStarted", (gameId) => {
+useAcknowledgeableEvent("GameStarted", (gameId) => {
   console.log("Game started", gameId)
   navigateTo("/game/" + gameId)
 })

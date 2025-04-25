@@ -32,7 +32,7 @@ const isPlayersTurn = ref(playerColor === "white")
 const opponentTimer = useTemplateRef("opponentTimer")
 const playerTimer = useTemplateRef("playerTimer")
 
-useConnectionEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
+useAcknowledgeableEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
   console.log("new move", gameUpdate)
 
   if (boardApi?.getLastMove()?.san === gameUpdate.san) {
@@ -49,7 +49,7 @@ useConnectionEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
 
 const secondsTillOpponentAutoResign = ref(-1)
 
-useConnectionEvent("OpponentConnectionLost", (reconnectionTimeout) => {
+useAcknowledgeableEvent("OpponentConnectionLost", (reconnectionTimeout) => {
   console.log("Opponent connection lost")
   secondsTillOpponentAutoResign.value = reconnectionTimeout / 1000
   const intervalId = setInterval(() => {
@@ -61,14 +61,14 @@ useConnectionEvent("OpponentConnectionLost", (reconnectionTimeout) => {
   }, 1000)
 })
 
-useConnectionEvent("OpponentReconnected", () => {
+useAcknowledgeableEvent("OpponentReconnected", () => {
   console.log("Opponent reconnected")
   secondsTillOpponentAutoResign.value = -1
 })
 
 const resultModal = reactive({ isOpen: false, playerPOVResult: "", reason: "" })
 
-useConnectionEvent("GameEnded", (res: GameResult) => {
+useAcknowledgeableEvent("GameEnded", (res: GameResult) => {
   console.log("game ended", res)
   boardConfig.viewOnly = true
   if (res.wonSide) {
