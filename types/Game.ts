@@ -15,6 +15,7 @@ export type OngoingGame = {
   playerRemainingTime: number
   opponentRemainingTime: number
   stakeEth: number
+  fen: string
 }
 
 export type GameEnding =

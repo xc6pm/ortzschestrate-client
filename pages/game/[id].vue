@@ -24,6 +24,7 @@ const boardConfig: BoardConfig = {
   premovable: { enabled: false },
   predroppable: { enabled: false },
   viewOnly: false,
+  fen: game.fen
 }
 
 let boardApi: BoardApi | undefined
