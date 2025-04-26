@@ -2,6 +2,8 @@ import * as signalr from "@microsoft/signalr"
 
 export const useConnectionStore = defineStore("connectionStore", () => {
   const connection = ref<signalr.HubConnection | null>()
+  const state = computed(() => connection.value?.state)
+  const reconnectionStatus = ref("")
 
   const resolveRunningConnection = async (): Promise<signalr.HubConnection> => {
     if (connection.value) {
@@ -18,6 +20,16 @@ export const useConnectionStore = defineStore("connectionStore", () => {
       .withUrl(server + "/hubs/game")
       .withAutomaticReconnect()
       .build()
+
+    conn.onreconnecting((error) => {
+      console.warn("Reconnecting...", error)
+      reconnectionStatus.value = "Reconnecting..."
+    })
+
+    conn.onreconnected((connectionId) => {
+      console.log("Reconnected")
+      reconnectionStatus.value = ""
+    })
 
     await conn.start()
 
@@ -40,5 +52,5 @@ export const useConnectionStore = defineStore("connectionStore", () => {
     connection.value?.off(methodName, handler)
   }
 
-  return { invoke, on, off }
+  return { invoke, on, off, state, reconnectionStatus }
 })

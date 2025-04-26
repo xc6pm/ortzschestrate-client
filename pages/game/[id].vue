@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { BoardApi, TheChessboard, type BoardConfig } from "vue3-chessboard"
 import "vue3-chessboard/style.css"
-import type { Game, GameResult, GameUpdate } from "~/types/Game"
+import type { OngoingGame, GameResult, GameUpdate } from "~/types/Game"
 
 const route = useRoute()
 const gameId = route.params.id
@@ -9,7 +9,7 @@ const gameId = route.params.id
 const userStore = useUserStore()
 const connectionStore = useConnectionStore()
 
-const game: Game = await connectionStore.invoke("getGame", gameId)
+const game: OngoingGame = await connectionStore.invoke("getGame", gameId)
 console.log("got game", game)
 if (!game) {
   const toast = useToast()
@@ -24,6 +24,7 @@ const boardConfig: BoardConfig = {
   premovable: { enabled: false },
   predroppable: { enabled: false },
   viewOnly: false,
+  fen: game.fen
 }
 
 let boardApi: BoardApi | undefined
@@ -32,7 +33,7 @@ const isPlayersTurn = ref(playerColor === "white")
 const opponentTimer = useTemplateRef("opponentTimer")
 const playerTimer = useTemplateRef("playerTimer")
 
-useConnectionEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
+useAcknowledgeableEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
   console.log("new move", gameUpdate)
 
   if (boardApi?.getLastMove()?.san === gameUpdate.san) {
@@ -47,10 +48,31 @@ useConnectionEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
   isPlayersTurn.value = true
 })
 
-const resultModal = reactive({ isOpen: false, playerPOVResult: "", reason: "" })
+const secondsTillOpponentAutoResign = ref(-1)
 
-useConnectionEvent("GameEnded", (res: GameResult) => {
+useAcknowledgeableEvent("OpponentConnectionLost", (reconnectionTimeout) => {
+  console.log("Opponent connection lost")
+  secondsTillOpponentAutoResign.value = reconnectionTimeout / 1000
+  const intervalId = setInterval(() => {
+    if (secondsTillOpponentAutoResign.value <= -1) {
+      clearInterval(intervalId)
+      return
+    }
+    secondsTillOpponentAutoResign.value--
+  }, 1000)
+})
+
+useAcknowledgeableEvent("OpponentReconnected", () => {
+  console.log("Opponent reconnected")
+  secondsTillOpponentAutoResign.value = -1
+})
+
+const resultModal = reactive({ isOpen: false, playerPOVResult: "", reason: "" })
+const gameEnded = ref(false)
+
+useAcknowledgeableEvent("GameEnded", (res: GameResult) => {
   console.log("game ended", res)
+  gameEnded.value = true
   boardConfig.viewOnly = true
   if (res.wonSide) {
     const playerWon = res.wonSide === game.color
@@ -88,16 +110,25 @@ const playerTimedOut = () => {
     }
   }, 1000)
 }
+
+const resign = async () => {
+  await connectionStore.invoke("resignShortGame")
+}
 </script>
 
 <template>
   <section class="h-[90svh] flex flex-col justify-between content-between">
     <UCard id="opponentCard" class="my-2 mx-auto w-full max-w-full landscape:max-w-[700px]">
       <div class="flex flex-row justify-between">
-        <span>{{ game.opponent }}</span>
+        <span
+          >{{ game.opponent }}
+          <span v-if="secondsTillOpponentAutoResign !== -1" class="text-xs"
+            >Disconnected, will auto-resign in {{ secondsTillOpponentAutoResign }}</span
+          ></span
+        >
         <ChessTimer
-          :run="!isPlayersTurn"
-          :duration="game.timeInMilliseconds"
+          :run="!isPlayersTurn && !gameEnded"
+          :duration="game.opponentRemainingTime"
           ref="opponentTimer"
           @timeout="playerTimedOut"
         />
@@ -114,10 +145,13 @@ const playerTimedOut = () => {
 
     <UCard id="playerCard" class="my-2 mx-auto w-full max-w-full landscape:max-w-[700px]">
       <div class="flex justify-between">
-        <span>{{ userStore.user?.userName }}</span>
+        <span
+          >{{ userStore.user?.userName }}
+          <UButton @click="resign" color="neutral" variant="outline">Resign</UButton></span
+        >
         <ChessTimer
-          :run="isPlayersTurn"
-          :duration="game.timeInMilliseconds"
+          :run="isPlayersTurn && !gameEnded"
+          :duration="game.playerRemainingTime"
           ref="playerTimer"
           @timeout="playerTimedOut"
         />
