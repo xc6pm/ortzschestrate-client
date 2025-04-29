@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { BoardApi, TheChessboard, type BoardConfig } from "vue3-chessboard"
 import "vue3-chessboard/style.css"
+import DesktopMoveRecord from "~/components/chess/DesktopMoveRecord.vue"
 import type { OngoingGame, GameResult, GameUpdate } from "~/types/Game"
 
 const route = useRoute()
@@ -24,8 +25,10 @@ const boardConfig: BoardConfig = {
   premovable: { enabled: false },
   predroppable: { enabled: false },
   viewOnly: false,
-  fen: game.fen
+  fen: game.fen,
 }
+
+const moveHistory = ref<string[]>(game.movesPlayed)
 
 let boardApi: BoardApi | undefined
 
@@ -36,13 +39,15 @@ const playerTimer = useTemplateRef("playerTimer")
 useAcknowledgeableEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
   console.log("new move", gameUpdate)
 
+  moveHistory.value.push(gameUpdate.san)
+
   if (boardApi?.getLastMove()?.san === gameUpdate.san) {
     playerTimer.value?.syncWithServer(gameUpdate.remainingTimeInMilliseconds)
     isPlayersTurn.value = false
     return
-  } else {
-    opponentTimer.value?.syncWithServer(gameUpdate.remainingTimeInMilliseconds)
   }
+
+  opponentTimer.value?.syncWithServer(gameUpdate.remainingTimeInMilliseconds)
 
   boardApi?.move(gameUpdate.san)
   isPlayersTurn.value = true
@@ -110,53 +115,55 @@ const playerTimedOut = () => {
     }
   }, 1000)
 }
-
-const resign = async () => {
-  await connectionStore.invoke("resignShortGame")
-}
 </script>
 
 <template>
-  <section class="h-[90svh] flex flex-col justify-between content-between">
-    <UCard id="opponentCard" class="my-2 mx-auto w-full max-w-full landscape:max-w-[700px]">
-      <div class="flex flex-row justify-between">
-        <span
-          >{{ game.opponent }}
-          <span v-if="secondsTillOpponentAutoResign !== -1" class="text-xs"
-            >Disconnected, will auto-resign in {{ secondsTillOpponentAutoResign }}</span
-          ></span
-        >
-        <ChessTimer
-          :run="!isPlayersTurn && !gameEnded"
-          :duration="game.opponentRemainingTime"
-          ref="opponentTimer"
-          @timeout="playerTimedOut"
-        />
-      </div>
-    </UCard>
+  <section class="flex flex-col md:flex-row justify-center w-full lg:max-w-[950px] mx-auto">
+    <section class="flex-1 flex flex-col justify-between content-between">
+      <UCard id="opponentCard" class="my-2 mx-auto w-full max-w-full md:max-w-[700px]">
+        <div class="flex flex-row justify-between">
+          <span
+            >{{ game.opponent }}
+            <span v-if="secondsTillOpponentAutoResign !== -1" class="text-xs"
+              >Disconnected, will auto-resign in {{ secondsTillOpponentAutoResign }}</span
+            ></span
+          >
+          <ChessTimer
+            :run="!isPlayersTurn && !gameEnded"
+            :duration="game.opponentRemainingTime"
+            ref="opponentTimer"
+            @timeout="playerTimedOut"
+          />
+        </div>
+      </UCard>
 
-    <TheChessboard
-      :player-color="playerColor"
-      :board-config="boardConfig"
-      @move="onMove"
-      @board-created="(api) => (boardApi = api)"
-      :reactive-config="true"
-    />
+      <TheChessboard
+        :player-color="playerColor"
+        :board-config="boardConfig"
+        @move="onMove"
+        @board-created="(api) => (boardApi = api)"
+        :reactive-config="true"
+        ref="chessboard"
+      />
 
-    <UCard id="playerCard" class="my-2 mx-auto w-full max-w-full landscape:max-w-[700px]">
-      <div class="flex justify-between">
-        <span
-          >{{ userStore.user?.userName }}
-          <UButton @click="resign" color="neutral" variant="outline">Resign</UButton></span
-        >
-        <ChessTimer
-          :run="isPlayersTurn && !gameEnded"
-          :duration="game.playerRemainingTime"
-          ref="playerTimer"
-          @timeout="playerTimedOut"
-        />
-      </div>
-    </UCard>
+      <UCard id="playerCard" class="my-2 mx-auto w-full max-w-full md:max-w-[700px]">
+        <div class="flex justify-between">
+          <span>{{ userStore.user?.userName }}</span>
+          <ChessTimer
+            :run="isPlayersTurn && !gameEnded"
+            :duration="game.playerRemainingTime"
+            ref="playerTimer"
+            @timeout="playerTimedOut"
+          />
+        </div>
+      </UCard>
+    </section>
+
+    <aside
+      class="hidden lg:flex lg:flex-1/4 lg:flex-col lg:min-w-[200px] lg:max-w-[250px]"
+    >
+      <DesktopMoveRecord :movesPlayed="moveHistory" class="m-2 w-full" />
+    </aside>
   </section>
 
   <UModal v-model:open="resultModal.isOpen">
