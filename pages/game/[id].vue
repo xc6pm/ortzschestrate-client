@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { BoardApi, TheChessboard, type BoardConfig } from "vue3-chessboard"
 import "vue3-chessboard/style.css"
-import DesktopMoveRecord from "~/components/chess/DesktopMoveRecord.vue"
 import type { OngoingGame, GameResult, GameUpdate } from "~/types/Game"
 
 const route = useRoute()
@@ -118,7 +117,9 @@ const playerTimedOut = () => {
 </script>
 
 <template>
-  <section class="flex flex-col md:flex-row justify-center w-full lg:max-w-[950px] mx-auto">
+  <section
+    class="flex h-[calc(100vh-73px)] overflow-auto md:h-auto md:overflow-visible flex-col lg:flex-row justify-center w-full lg:max-w-[950px] mx-auto"
+  >
     <section class="flex-1 flex flex-col justify-between content-between">
       <UCard id="opponentCard" class="my-2 mx-auto w-full max-w-full md:max-w-[700px]">
         <div class="flex flex-row justify-between">
@@ -144,25 +145,30 @@ const playerTimedOut = () => {
         @board-created="(api) => (boardApi = api)"
         :reactive-config="true"
         ref="chessboard"
+        class="max-w-[700px]"
       />
 
-      <UCard id="playerCard" class="my-2 mx-auto w-full max-w-full md:max-w-[700px]">
-        <div class="flex justify-between">
-          <span>{{ userStore.user?.userName }}</span>
-          <ChessTimer
-            :run="isPlayersTurn && !gameEnded"
-            :duration="game.playerRemainingTime"
-            ref="playerTimer"
-            @timeout="playerTimedOut"
-          />
+      <div>
+        <UCard id="playerCard" class="mt-2 lg:mb-2 mx-auto w-full max-w-full md:max-w-[700px]">
+          <div class="flex justify-between">
+            <span>{{ userStore.user?.userName }}</span>
+            <ChessTimer
+              :run="isPlayersTurn && !gameEnded"
+              :duration="game.playerRemainingTime"
+              ref="playerTimer"
+              @timeout="playerTimedOut"
+            />
+          </div>
+        </UCard>
+
+        <div class="lg:hidden mx-0 mt-2 bg-gray-100">
+          <ChessMobileMoveRecord :moves-played="moveHistory" class="max-w-[700px] mx-auto" />
         </div>
-      </UCard>
+      </div>
     </section>
 
-    <aside
-      class="hidden lg:flex lg:flex-1/4 lg:flex-col lg:min-w-[200px] lg:max-w-[250px]"
-    >
-      <DesktopMoveRecord :movesPlayed="moveHistory" class="m-2 w-full" />
+    <aside class="hidden lg:flex lg:flex-1/4 lg:flex-col lg:min-w-[200px] lg:max-w-[250px] ">
+      <ChessDesktopMoveRecord :movesPlayed="moveHistory" class="m-2 w-full" />
     </aside>
   </section>
 
