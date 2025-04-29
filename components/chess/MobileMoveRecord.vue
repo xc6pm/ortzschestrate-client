@@ -19,9 +19,9 @@ watch(movePairs, async () => {
     <div class="inline-flex text-sm leading-relaxed ">
       <template v-for="(pair, index) in movePairs" :key="index">
         <div class="flex items-center mr-4 mb-2">
-          <span class="font-semibold">{{ index + 1 }}.</span>&nbsp; <span class="bg-gray-300 px-1 rounded">{{ pair.white }}</span
+          <span class="font-semibold">{{ index + 1 }}.</span>&nbsp; <span class="bg-gray-300 dark:bg-gray-400 px-1 rounded">{{ pair.white }}</span
           >&nbsp;
-          <span class="bg-gray-500 text-slate-100 px-1 rounded">{{ pair.black }}</span>
+          <span class="bg-gray-500 dark:bg-gray-600 text-slate-100 px-1 rounded">{{ pair.black }}</span>
         </div>
       </template>
 

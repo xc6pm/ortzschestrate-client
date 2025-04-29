@@ -161,7 +161,7 @@ const playerTimedOut = () => {
           </div>
         </UCard>
 
-        <div class="lg:hidden mx-0 mt-2 bg-gray-100">
+        <div class="lg:hidden mx-0 mt-2 bg-gray-100 dark:bg-gray-900">
           <ChessMobileMoveRecord :moves-played="moveHistory" class="max-w-[700px] mx-auto" />
         </div>
       </div>
