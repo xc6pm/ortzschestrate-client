@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+@import "./piece-svgs";
 
 @theme static {
   --color-shamrock: #4ade80;

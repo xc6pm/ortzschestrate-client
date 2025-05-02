@@ -24,12 +24,36 @@ const boardConfig: BoardConfig = {
   premovable: { enabled: false },
   predroppable: { enabled: false },
   viewOnly: false,
-  fen: game.fen,
 }
 
 const moveHistory = ref<string[]>(game.movesPlayed)
 
 let boardApi: BoardApi | undefined
+
+const playerCapturedPieces = ref<string[]>([])
+const opponentCapturedPieces = ref<string[]>([])
+
+const updatePlayerCapturedPieces = () => {
+  if (!boardApi) return
+
+  playerCapturedPieces.value =
+    game.color === "w" ? boardApi.getCapturedPieces().white : boardApi.getCapturedPieces().black
+}
+const updateOpponentCapturedPieces = () => {
+  if (!boardApi) return
+
+  opponentCapturedPieces.value =
+    game.color === "w" ? boardApi.getCapturedPieces().black : boardApi.getCapturedPieces().white
+}
+
+const onBoardCreated = (api: BoardApi) => {
+  boardApi = api
+
+  boardApi.loadPgn(game.pgn)
+
+  updatePlayerCapturedPieces()
+  updateOpponentCapturedPieces()
+}
 
 const isPlayersTurn = ref(playerColor === "white")
 const opponentTimer = useTemplateRef("opponentTimer")
@@ -43,6 +67,7 @@ useAcknowledgeableEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
   if (boardApi?.getLastMove()?.san === gameUpdate.san) {
     playerTimer.value?.syncWithServer(gameUpdate.remainingTimeInMilliseconds)
     isPlayersTurn.value = false
+    updatePlayerCapturedPieces()
     return
   }
 
@@ -50,6 +75,8 @@ useAcknowledgeableEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
 
   boardApi?.move(gameUpdate.san)
   isPlayersTurn.value = true
+
+  updateOpponentCapturedPieces()
 })
 
 const secondsTillOpponentAutoResign = ref(-1)
@@ -121,20 +148,27 @@ const playerTimedOut = () => {
     class="flex h-[calc(100vh-73px)] overflow-auto md:h-auto md:overflow-visible flex-col lg:flex-row justify-center w-full lg:max-w-[950px] mx-auto"
   >
     <section class="flex-1 flex flex-col justify-between content-between">
-      <UCard id="opponentCard" class="my-2 mx-auto w-full max-w-full md:max-w-[700px]">
-        <div class="flex flex-row justify-between">
-          <span
-            >{{ game.opponent }}
-            <span v-if="secondsTillOpponentAutoResign !== -1" class="text-xs"
-              >Disconnected, will auto-resign in {{ secondsTillOpponentAutoResign }}</span
-            ></span
-          >
-          <ChessTimer
-            :run="!isPlayersTurn && !gameEnded"
-            :duration="game.opponentRemainingTime"
-            ref="opponentTimer"
-            @timeout="playerTimedOut"
-          />
+      <UCard id="opponentCard" class="my-2 mx-auto w-full max-w-full md:max-w-[700px]" :ui="{ body: 'sm:py-2' }">
+        <div class="flex flex-row justify-between items-center">
+          <div class="flex flex-row items-center">
+            <span>{{ game.opponent }}</span>
+
+            <span v-if="secondsTillOpponentAutoResign !== -1" class="text-xs ml-1">
+              Disconnected, will auto-resign in {{ secondsTillOpponentAutoResign }}
+            </span>
+          </div>
+
+          <div class="flex flex-row items-center">
+            <ChessCapturedPieces :items="opponentCapturedPieces" :color="game.color === 'w' ? 'b' : 'w'" />
+
+            <ChessTimer
+              :run="!isPlayersTurn && !gameEnded"
+              :duration="game.opponentRemainingTime"
+              ref="opponentTimer"
+              @timeout="playerTimedOut"
+              class="mt-0.5"
+            />
+          </div>
         </div>
       </UCard>
 
@@ -142,22 +176,32 @@ const playerTimedOut = () => {
         :player-color="playerColor"
         :board-config="boardConfig"
         @move="onMove"
-        @board-created="(api) => (boardApi = api)"
+        @board-created="onBoardCreated"
         :reactive-config="true"
         ref="chessboard"
         class="max-w-[700px]"
       />
 
       <div>
-        <UCard id="playerCard" class="mt-2 lg:mb-2 mx-auto w-full max-w-full md:max-w-[700px]">
-          <div class="flex justify-between">
+        <UCard
+          id="playerCard"
+          class="mt-2 lg:mb-2 mx-auto w-full max-w-full md:max-w-[700px]"
+          :ui="{ body: 'sm:py-2' }"
+        >
+          <div class="flex justify-between items-center">
             <span>{{ userStore.user?.userName }}</span>
-            <ChessTimer
-              :run="isPlayersTurn && !gameEnded"
-              :duration="game.playerRemainingTime"
-              ref="playerTimer"
-              @timeout="playerTimedOut"
-            />
+
+            <div class="flex flex-row items-center">
+              <ChessCapturedPieces :items="playerCapturedPieces" :color="game.color" />
+
+              <ChessTimer
+                :run="isPlayersTurn && !gameEnded"
+                :duration="game.playerRemainingTime"
+                ref="playerTimer"
+                @timeout="playerTimedOut"
+                class="mt-0.5"
+              />
+            </div>
           </div>
         </UCard>
 
@@ -167,7 +211,7 @@ const playerTimedOut = () => {
       </div>
     </section>
 
-    <aside class="hidden lg:flex lg:flex-1/4 lg:flex-col lg:min-w-[200px] lg:max-w-[250px] ">
+    <aside class="hidden lg:flex lg:flex-1/4 lg:flex-col lg:min-w-[200px] lg:max-w-[250px]">
       <ChessDesktopMoveRecord :movesPlayed="moveHistory" class="m-2 w-full" />
     </aside>
   </section>
