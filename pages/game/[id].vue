@@ -141,6 +141,8 @@ const playerTimedOut = () => {
     }
   }, 1000)
 }
+
+const { isMobile } = useIsMobile()
 </script>
 
 <template>
@@ -205,13 +207,13 @@ const playerTimedOut = () => {
           </div>
         </UCard>
 
-        <div class="lg:hidden mx-0 mt-2 bg-gray-100 dark:bg-gray-900">
+        <div v-if="isMobile" class="mx-0 mt-2 bg-gray-100 dark:bg-gray-900">
           <ChessMobileMoveRecord :moves-played="moveHistory" class="max-w-[700px] mx-auto" />
         </div>
       </div>
     </section>
 
-    <aside class="hidden lg:flex lg:flex-1/4 lg:flex-col lg:min-w-[200px] lg:max-w-[250px]">
+    <aside v-if="!isMobile" class="flex flex-1/4 flex-col min-w-[200px] max-w-[250px]">
       <ChessDesktopMoveRecord :movesPlayed="moveHistory" class="m-2 w-full" />
     </aside>
   </section>

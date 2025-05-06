@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "typescript": "^5.8.2",
-    "vercel": "^41.4.1"
+    "vercel": "^41.4.1",
+    "@vueuse/nuxt": "13.1.0"
   }
 }

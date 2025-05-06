@@ -38,3 +38,16 @@ export type GameUpdate = {
   san: string
   remainingTimeInMilliseconds: number
 }
+
+export type FinishedGame = {
+  id: string
+  players: Player[]
+  playerColors: string[]
+  stakeEth: number
+  timeInMs: number
+  started: Date
+  remainingTimesInMs: number[]
+  pgn: string
+  endgameType: string
+  wonSide: string
+}
