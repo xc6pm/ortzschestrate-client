@@ -4,6 +4,7 @@ export const useConnectionStore = defineStore("connectionStore", () => {
   const connection = ref<signalr.HubConnection | null>()
   const state = computed(() => connection.value?.state)
   const reconnectionStatus = ref("")
+  const attachOnConnectionInit: { methodName: string; handler: (...args: any[]) => any }[] = []
 
   const resolveRunningConnection = async (): Promise<signalr.HubConnection> => {
     if (connection.value) {
@@ -31,6 +32,13 @@ export const useConnectionStore = defineStore("connectionStore", () => {
       reconnectionStatus.value = ""
     })
 
+    if (attachOnConnectionInit.length) {
+      for (let evt of attachOnConnectionInit) {
+        conn.on(evt.methodName, evt.handler)
+      }
+      attachOnConnectionInit.splice(0, attachOnConnectionInit.length)
+    }
+
     await conn.start()
 
     connection.value = conn
@@ -45,7 +53,8 @@ export const useConnectionStore = defineStore("connectionStore", () => {
   }
 
   const on = (methodName: string, handler: (...args: any[]) => any) => {
-    connection.value?.on(methodName, handler)
+    if (connection.value) connection.value.on(methodName, handler)
+    else attachOnConnectionInit.push({ methodName, handler })
   }
 
   const off = (methodName: string, handler: (...args: any[]) => any) => {

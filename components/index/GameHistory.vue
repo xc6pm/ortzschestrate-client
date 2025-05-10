@@ -1,24 +1,12 @@
 <script setup lang="ts">
-import type { FinishedGame } from "~/types/Game"
+import { useRecentGamesStore } from "~/stores/recentGames"
 
-const games = ref<FinishedGame[]>([])
-
-try {
-  games.value = await $fetch<FinishedGame[]>(apiUrl("/history/games"), {
-    method: "GET",
-    params: {
-      page: 1,
-    },
-    credentials: "include",
-  })
-} catch (error) {
-  console.error("Error fetching recent games:", error)
-}
+const { recentGames } = storeToRefs(useRecentGamesStore())
 
 const userStore = useUserStore()
 
-const recentGames = computed(() =>
-  games.value.map((game) => {
+const recentGamesToDisplay = computed(() =>
+  recentGames.value.map((game) => {
     const opponent = game.players.find((p) => p.userId !== userStore.user?.id)
     const userIndex = game.players.findIndex((p) => p.userId === userStore.user?.id)
     const userColor = game.playerColors[userIndex]
@@ -37,7 +25,7 @@ const recentGames = computed(() =>
 </script>
 
 <template>
-  <UCard v-if="games.length">
+  <UCard v-if="recentGames.length">
     <template #header>
       <h2 class="text-lg text-center">Recent Games</h2>
     </template>
@@ -52,7 +40,7 @@ const recentGames = computed(() =>
           <td class="w-8"></td>
         </tr>
 
-        <tr v-for="game in recentGames" :key="game.id">
+        <tr v-for="game in recentGamesToDisplay" :key="game.id">
           <td class="py-2">
             <div
               class="w-4 h-4 rounded-sm border-2 border-gray-400 dark:border-gray-600"

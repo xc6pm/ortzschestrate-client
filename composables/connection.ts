@@ -1,3 +1,5 @@
+import type { AckMessage } from "~/types/Game"
+
 export const useConnectionEvent = (eventName: string, handler: (...args: any[]) => any) => {
   const connectionStore = useConnectionStore()
   onMounted(() => connectionStore.on(eventName, handler))
@@ -15,9 +17,4 @@ export const useAcknowledgeableEvent = (eventName: string, handler: (...args: an
 
   onMounted(() => connectionStore.on(eventName, ackHandler))
   onUnmounted(() => connectionStore.off(eventName, ackHandler))
-}
-
-type AckMessage = {
-  messageId: number
-  message: any
 }

@@ -51,3 +51,8 @@ export type FinishedGame = {
   endgameType: string
   wonSide: string
 }
+
+export type AckMessage = {
+  messageId: number
+  message: any
+}                                        
