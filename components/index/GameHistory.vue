@@ -22,6 +22,10 @@ const recentGamesToDisplay = computed(() =>
     }
   })
 )
+
+const goToGame = async (gameId: string) => {
+  await navigateTo(`/history/${gameId}`)
+}
 </script>
 
 <template>
@@ -40,7 +44,12 @@ const recentGamesToDisplay = computed(() =>
           <td class="w-8"></td>
         </tr>
 
-        <tr v-for="game in recentGamesToDisplay" :key="game.id">
+        <tr
+          v-for="game in recentGamesToDisplay"
+          :key="game.id"
+          @click="goToGame(game.id)"
+          class="cursor-pointer group"
+        >
           <td class="py-2">
             <div
               class="w-4 h-4 rounded-sm border-2 border-gray-400 dark:border-gray-600"
@@ -48,7 +57,7 @@ const recentGamesToDisplay = computed(() =>
             ></div>
           </td>
 
-          <td class="py-2">
+          <td class="py-2 group-hover:underline">
             {{ game.opponentName }}
           </td>
 

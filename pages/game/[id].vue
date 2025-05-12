@@ -214,7 +214,7 @@ const { isMobile } = useIsMobile()
     </section>
 
     <aside v-if="!isMobile" class="flex flex-1/4 flex-col min-w-[200px] max-w-[250px]">
-      <ChessDesktopMoveRecord :movesPlayed="moveHistory" class="m-2 w-full" />
+      <ChessDesktopMoveRecord :movesPlayed="moveHistory" :show-resign-button="true" class="m-2 w-full" />
     </aside>
   </section>
 

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 const props = defineProps<{
-  movesPlayed: string[]
+  movesPlayed: string[],
+  showResignButton: boolean
 }>()
 
 const { movePairs } = useMovePairs(props.movesPlayed)
@@ -24,7 +25,7 @@ const resign = async () => {
       </tbody>
     </table>
 
-    <template #footer>
+    <template v-if="showResignButton" #footer>
       <UButton label="Resign" block variant="outline" color="neutral" class="end-0" @click="resign" />
     </template>
   </UCard>
