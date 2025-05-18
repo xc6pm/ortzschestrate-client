@@ -64,21 +64,21 @@ const winner =
     : game?.wonSide === game?.playerColors[0]
     ? game?.players[0].name
     : game?.players[1].name
-
 </script>
 
 <template>
-  <UCard class="mt-2 mx-auto max-w-[700px] lg:max-w-[960px] bg-shamrock-500 dark:bg-shamrock-700">
+  <UCard class="mt-2 w-full mx-auto max-w-[700px] lg:max-w-[960px] bg-shamrock-500 dark:bg-shamrock-700">
     <p v-if="winner">
-      {{ winner === userStore.user?.userName ? 'You ' : winner }} won this game by {{ game?.endgameType === "Resigned" ? "resignation" : game?.endgameType }}
+      {{ winner === userStore.user?.userName ? "You " : winner }} won this game by
+      {{ game?.endgameType === "Resigned" ? "resignation" : game?.endgameType }}
     </p>
     <p v-else>Game ended in a draw by {{ game?.endgameType }}</p>
   </UCard>
-
+  
   <section
-    class="flex h-[calc(100vh-73px)] overflow-auto md:h-auto md:overflow-visible flex-col lg:flex-row justify-center w-full lg:max-w-[950px] mx-auto"
+    class="flex h-[calc(100vh-73px)] overflow-auto md:h-auto md:overflow-visible flex-col lg:flex-row lg:gap-2 justify-center w-full mx-auto lg:max-w-[960px]"
   >
-    <section class="flex-1 flex flex-col justify-between content-between">
+    <section class="flex-1 flex flex-col justify-between content-between md:max-w-[700px]">
       <UCard id="opponentCard" class="my-2 mx-auto w-full max-w-full md:max-w-[700px]" :ui="{ body: 'sm:py-2' }">
         <div class="flex flex-row justify-between items-center">
           <span class="flex flex-row items-center">{{ opponent }}</span>
@@ -133,7 +133,12 @@ const winner =
     </section>
 
     <aside v-if="!isMobile" class="flex flex-1/4 flex-col min-w-[200px] max-w-[250px]">
-      <ChessDesktopMoveRecord :moves-played="moveHistory" :show-resign-button="false" :key="moveHistory.length" class="m-2 w-full" />
+      <ChessDesktopMoveRecord
+        :moves-played="moveHistory"
+        :show-resign-button="false"
+        :key="moveHistory.length"
+        class="my-2 w-full"
+      />
     </aside>
   </section>
 </template>
