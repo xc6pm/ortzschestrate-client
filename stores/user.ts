@@ -2,6 +2,7 @@ export type User = { id: string; userName: string; email: string; verifiedWallet
 
 export const useUserStore = defineStore("userStore", () => {
   const user = ref<User | null>(null)
+  const initialized = ref(false)
 
   const fetch = async () => {
     try {
@@ -16,8 +17,10 @@ export const useUserStore = defineStore("userStore", () => {
       if (error.message.includes("401")) {
         user.value = null
       }
+    } finally {
+      initialized.value = true
     }
   }
 
-  return { user, fetch }
+  return { user, fetch, initialized }
 })

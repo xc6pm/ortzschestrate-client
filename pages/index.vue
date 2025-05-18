@@ -15,11 +15,11 @@ const { isMobile } = useIsMobile()
       <SetupGameForm class="my-3 ml-0 lg:mr-3 lg:w-80 lg:h-fit" />
       <IndexOngoingGamesList class="my-3 lg:mr-3 lg:w-80 lg:h-fit" />
 
-      <IndexGameHistory v-if="!isMobile" class="my-3 lg:mr-3 lg:w-80 lg:h-fit" />
+      <IndexRecentGames v-if="!isMobile" class="my-3 lg:mr-3 lg:w-80 lg:h-fit" />
     </div>
 
     <PendingGamesTable class="mt-3 grow" />
 
-    <IndexGameHistory v-if="isMobile" class="my-3 lg:mr-3 lg:w-80 lg:h-fit" />
+    <IndexRecentGames v-if="isMobile" class="my-3 lg:mr-3 lg:w-80 lg:h-fit" />
   </section>
 </template>

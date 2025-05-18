@@ -6,14 +6,12 @@ import type { FinishedGame } from "~/types/Game"
 
 const gameId = useRoute().params.gameId as string
 
-const game =
-  useRecentGamesStore().recentGames.find((g) => g.id === gameId) ??
-  (await $fetch<FinishedGame>(apiUrl("/history/game"), {
-    method: "get",
-    params: { id: gameId },
-    credentials: "include",
-    ignoreResponseError: true,
-  }))
+const game = await $fetch<FinishedGame>(apiUrl("/history/game"), {
+  method: "get",
+  params: { id: gameId },
+  credentials: "include",
+  ignoreResponseError: true,
+})
 
 if (!game) {
   const toast = useToast()

@@ -1,9 +1,9 @@
 export type Player = { userId: string; name: string }
-export type GameType = { name: string; value: number }
+export type TimeControl = { name: string; value: number }
 export type PieceColor = { asChar: string; name: string; value: number }
 export type PendingGame = {
   creator: Player
-  gameType: GameType
+  timeControl: TimeControl
   creatorColor: PieceColor
 }
 
@@ -44,7 +44,7 @@ export type FinishedGame = {
   players: Player[]
   playerColors: string[]
   stakeEth: number
-  timeInMs: number
+  timeControl: TimeControl
   started: Date
   remainingTimesInMs: number[]
   pgn: string
@@ -52,7 +52,17 @@ export type FinishedGame = {
   wonSide: string
 }
 
+export type FinishedGameSlim = {
+  id: string
+  players: Player[]
+  playerColors: string[]
+  stakeEth: number
+  timeControl: TimeControl
+  started: Date
+  wonSide: string
+}
+
 export type AckMessage = {
   messageId: number
   message: any
-}                                        
+}

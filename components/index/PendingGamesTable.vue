@@ -12,7 +12,7 @@ const pendingGameFields: TableColumn<PendingGame>[] = [
   },
   {
     header: "Time",
-    cell: ({ row }) => row.original.gameType.name,
+    cell: ({ row }) => row.original.timeControl.name,
   },
   {
     header: "Your Color",

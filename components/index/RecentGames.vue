@@ -1,27 +1,29 @@
 <script setup lang="ts">
-import { useRecentGamesStore } from "~/stores/recentGames"
+import type { FinishedGame } from "~/types/Game"
 
-const { recentGames } = storeToRefs(useRecentGamesStore())
+const recentGames = await $fetch<FinishedGame[]>(apiUrl("/history/games"), {
+  method: "GET",
+  params: { page: 1, count: 10 },
+  credentials: "include",
+})
 
 const userStore = useUserStore()
 
-const recentGamesToDisplay = computed(() =>
-  recentGames.value.map((game) => {
-    const opponent = game.players.find((p) => p.userId !== userStore.user?.id)
-    const userIndex = game.players.findIndex((p) => p.userId === userStore.user?.id)
-    const userColor = game.playerColors[userIndex]
+const processedGames = recentGames.map((game) => {
+  const opponent = game.players.find((p) => p.userId !== userStore.user?.id)
+  const userIndex = game.players.findIndex((p) => p.userId === userStore.user?.id)
+  const userColor = game.playerColors[userIndex]
 
-    const result = game.wonSide === userColor ? "Win" : !game.wonSide ? "Draw" : "Loss"
+  const result = game.wonSide === userColor ? "Win" : !game.wonSide ? "Draw" : "Loss"
 
-    return {
-      id: game.id,
-      color: game.playerColors[userIndex],
-      opponentName: opponent?.name || "Unknown",
-      wagered: game.stakeEth > 0,
-      result,
-    }
-  })
-)
+  return {
+    id: game.id,
+    color: game.playerColors[userIndex],
+    opponentName: opponent?.name || "Unknown",
+    wagered: game.stakeEth > 0,
+    result,
+  }
+})
 
 const goToGame = async (gameId: string) => {
   await navigateTo(`/history/${gameId}`)
@@ -31,7 +33,7 @@ const goToGame = async (gameId: string) => {
 <template>
   <UCard v-if="recentGames.length">
     <template #header>
-      <h2 class="text-lg text-center">Recent Games</h2>
+      <h2 class="text-lg text-center"><NuxtLink href="/history">Recent Games</NuxtLink></h2>
     </template>
 
     <table class="min-w-full table-auto border-collapse">
@@ -44,12 +46,7 @@ const goToGame = async (gameId: string) => {
           <td class="w-8"></td>
         </tr>
 
-        <tr
-          v-for="game in recentGamesToDisplay"
-          :key="game.id"
-          @click="goToGame(game.id)"
-          class="cursor-pointer group"
-        >
+        <tr v-for="game in processedGames" :key="game.id" @click="goToGame(game.id)" class="cursor-pointer group">
           <td class="py-2">
             <div
               class="w-4 h-4 rounded-sm border-2 border-gray-400 dark:border-gray-600"
