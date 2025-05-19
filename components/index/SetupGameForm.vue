@@ -3,9 +3,9 @@ import type { FormError } from "@nuxt/ui"
 import { useContractStateStore } from "~/stores/contractState"
 
 const gameTimes = [
-  { label: "Rapid", value: 10 },
-  { label: "Blitz", value: 5 },
-  { label: "Bullet", value: 3 },
+  { label: "Rapid", value: 600000 },
+  { label: "Blitz", value: 300000 },
+  { label: "Bullet", value: 180000 },
 ]
 const colors = [
   { label: "White", value: "w" },
@@ -13,7 +13,7 @@ const colors = [
 ]
 
 const minStakeAmount = 0.0003
-const newGame = reactive({ time: 10, color: "w", wagered: false, stake: 0 })
+const newGame = reactive({ time: 600000, color: "w", wagered: false, stake: 0 })
 const contractState = useContractStateStore()
 watch(
   () => newGame.wagered,
