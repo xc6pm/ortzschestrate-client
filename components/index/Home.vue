@@ -6,6 +6,9 @@ const blurBackgroundOnScroll = () => {
   isBlurred.value = window.scrollY > 1
 }
 
+const bgId = Math.floor(Math.random() * 4)
+const backgroundImagePath = `/img/home-bg/${bgId}.png`
+
 onMounted(() => {
   window.addEventListener("scroll", blurBackgroundOnScroll)
 })
@@ -24,7 +27,7 @@ onUnmounted(() => {
         style="z-index: -1"
         quality="80"
         preload
-        src="/img/home-bg.png"
+        :src="backgroundImagePath"
         v-on:load="() => (imgLoaded = true)"
       />
     </div>
