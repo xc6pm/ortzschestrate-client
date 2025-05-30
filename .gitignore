@@ -26,3 +26,6 @@ logs
 
 public/deployment/dev
 .vercel
+
+localhost.pem
+localhost-key.pem
