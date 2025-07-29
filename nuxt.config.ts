@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiUrl: process.env.NUXT_API_URL,
+      serverAddress: process.env.SERVER_ADDRESS,
       reownProjectId: process.env.REOWN_PROJECT_ID,
     },
   },
