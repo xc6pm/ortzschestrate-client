@@ -62,8 +62,6 @@ const playerTimer = useTemplateRef("playerTimer")
 useAcknowledgeableEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
   console.log("new move", gameUpdate)
 
-  moveHistory.value.push(gameUpdate.san)
-
   if (boardApi?.getLastMove()?.san === gameUpdate.san) {
     playerTimer.value?.syncWithServer(gameUpdate.remainingTimeInMilliseconds)
     isPlayersTurn.value = false
@@ -118,6 +116,8 @@ useAcknowledgeableEvent("GameEnded", (res: GameResult) => {
 
 const onMove = async (move: any) => {
   console.log("onMove", move)
+
+  moveHistory.value.push(move.san)
 
   // move came from server.
   if (move.color !== game.color) return
