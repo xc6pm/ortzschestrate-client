@@ -30,7 +30,6 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      // https://github.com/wevm/wagmi/issues/3977
       include: ["eventemitter3"],
     },
   },
