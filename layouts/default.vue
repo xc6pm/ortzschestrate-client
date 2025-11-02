@@ -10,15 +10,15 @@ const userStore = useUserStore()
     <UContainer class="max-w-7xl mx-auto px-4 flex justify-between items-center">
       <NuxtLink to="/"><span class="text-3xl font-bold text-green-400">nietzschess</span></NuxtLink>
 
-      <nav class="flex items-center gap-6">
-        <NuxtLink to="/shop" class="text-white hover:text-green-400 transition-colors font-medium"> Shop </NuxtLink>
+      <div class="relative flex flex-row gap-3">
+        <NuxtLink to="/shop" class="text-white hover:text-green-400 transition-colors font-medium mt-1 mr-1">
+          Shop
+        </NuxtLink>
 
-        <div class="relative flex flex-row">
-          <WalletButton v-if="userStore.user" />
+        <WalletButton v-if="userStore.user" />
 
-          <UserButton class="ml-2" />
-        </div>
-      </nav>
+        <UserButton />
+      </div>
     </UContainer>
   </header>
 

@@ -38,10 +38,16 @@ const nftItems = ref([
     image: "https://placehold.co/400x400/1f2937/10b981?text=Pawn+%23006",
   },
 ])
+
+const nftStore = useNFTStore()
 </script>
 
 <template>
-  <div class="py-8">
+  <div class="flex justify-end mb-4 mt-4">
+    <UButton v-if="nftStore.isUserNFTOwner" label="Mint" variant="outline" to="/shop/mint" />
+  </div>
+
+  <div class="pb-8">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <ShopItemCard
         v-for="item in nftItems"

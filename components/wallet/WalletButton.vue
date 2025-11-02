@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { createAppKit, type ThemeMode } from "@reown/appkit/vue"
 import { useAccount } from "@wagmi/vue"
-import { networks } from "~/web3/wagmiConfig"
 import AccountButton from "./AccountButton.vue"
 
 const account = useAccount()
@@ -27,10 +26,12 @@ const metadata = {
 }
 
 const colorMode = useColorMode()
+
+const { networks } = useWagmi()
 // 5. Create the modal
 const modal = createAppKit({
   adapters: [wagmiAdapter],
-  networks,
+  networks: [networks[0], ...networks],
   projectId,
   metadata,
   features: {

@@ -20,6 +20,7 @@
     "@reown/appkit-adapter-wagmi": "^1.6.8",
     "@tanstack/vue-query": "^5.66.0",
     "@types/node": "22.15.1",
+    "@wagmi/core": "^2.22.1",
     "@wagmi/vue": "^0.1.14",
     "eventemitter3": "5.0.0",
     "nuxt": "^3.16.0",
