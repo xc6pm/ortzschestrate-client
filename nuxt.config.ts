@@ -16,6 +16,7 @@ export default defineNuxtConfig({
       apiUrl: process.env.NUXT_API_URL,
       serverAddress: process.env.SERVER_ADDRESS,
       reownProjectId: process.env.REOWN_PROJECT_ID,
+      pinataJwt: process.env.PINATA_JWT,
     },
   },
 

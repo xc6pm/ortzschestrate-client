@@ -7,7 +7,25 @@ export const useNFTStore = defineStore("nftStore", () => {
   const userStore = useUserStore()
   const blockchainAccount = useAccount()
   const { config } = useWagmi()
+  const deployment = ref<Deployment | null>(null)
   const isUserNFTOwner = ref(false)
+
+  // Use this inside this store to ensure we try to load the deployment if it has failed before.
+  const tryLoadDeployment: () => Promise<Deployment | null> = async () => {
+    if (deployment.value) return deployment.value
+
+    const nftContract = "NietzschessNFT"
+    const nftContractDeployment = `/deployment/${nftContract}.json`
+    try {
+      const depl = await $fetch<Deployment>(nftContractDeployment)
+      deployment.value = Object.freeze(depl)
+    } catch {
+      deployment.value = null
+    }
+    return deployment.value
+  }
+
+  tryLoadDeployment()
 
   watchEffect(async () => {
     if (!userStore.user || !blockchainAccount.address?.value) {
@@ -23,21 +41,17 @@ export const useNFTStore = defineStore("nftStore", () => {
       return
     }
 
-    const nftContract = "NietzschessNFT"
-    const nftContractDeployment = `/deployment/${nftContract}.json`
-
-    const deployment = Object.freeze(await $fetch<Deployment>(nftContractDeployment))
-    if (!deployment) {
+    const depl = await tryLoadDeployment()
+    if (!depl) {
       console.log("Deployment not found")
       isUserNFTOwner.value = false
       return
     }
 
-    console.log("depl json", deployment)
-
+    console.log("depl json", depl)
     const res = await readContract(config, {
-      abi: deployment.abi as Abi,
-      address: deployment.address,
+      abi: depl.abi as Abi,
+      address: depl.address,
       functionName: "owner",
       args: [],
     })
@@ -47,5 +61,5 @@ export const useNFTStore = defineStore("nftStore", () => {
     isUserNFTOwner.value = (res as `0x${string}`) === blockchainAccount.address.value
   })
 
-  return { isUserNFTOwner }
+  return { deployment, isUserNFTOwner }
 })
