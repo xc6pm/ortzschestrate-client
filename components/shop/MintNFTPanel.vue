@@ -57,31 +57,9 @@ const handleMint = async () => {
 }
 
 const mint = async () => {
-  const pinataJwt = useRuntimeConfig().public.pinataJwt
-  const data = new FormData()
-  data.append("file", nftData.image!)
-  data.append("name", nftData.name)
-  data.append("network", "public")
-
-  // nft metadata
-  const keyvalues: { [key: string]: string } = {
-    name: nftData.name,
-    description: nftData.description,
-  }
-  for (const attr of attributes.value) {
-    keyvalues[attr.key] = attr.value
-  }
-  data.append("keyvalues", JSON.stringify(keyvalues))
-
-  let pinataUploadRes: { data: PinataUploadResponse }
+  let uploadRes: PinataUploadResponse
   try {
-    pinataUploadRes = await $fetch<{ data: PinataUploadResponse }>("https://uploads.pinata.cloud/v3/files", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${pinataJwt}`,
-      },
-      body: data,
-    })
+    uploadRes = await uploadToPinata()
   } catch (error) {
     console.error(error)
     toast.add({
@@ -104,13 +82,52 @@ const mint = async () => {
     return
   }
 
-
   writeContract({
     address: nftStore.deployment!.address,
     abi: nftStore.deployment!.abi as Abi,
     functionName: "safeMint",
-    args: [account.address.value, pinataUploadRes.data.cid],
+    args: [account.address.value, uploadRes.cid],
   })
+
+  console.log("writeContract ran", writeContractErr)
+}
+
+const uploadToPinata = async () => {
+  const pinataJwt = useRuntimeConfig().public.pinataJwt
+  const imageForm = new FormData()
+  imageForm.append("file", nftData.image!)
+  imageForm.append("name", nftData.name)
+  imageForm.append("network", "public")
+
+  const imageUploadRes = await $fetch<{ data: PinataUploadResponse }>("https://uploads.pinata.cloud/v3/files", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${pinataJwt}`,
+    },
+    body: imageForm,
+  })
+
+  const metadata = {
+    name: nftData.name,
+    description: nftData.description,
+    image: `ipfs://${imageUploadRes.data.cid}`,
+    attributes: attributes.value.map((a) => ({ trait_type: a.key, value: a.value })),
+  }
+  const blob = new Blob([JSON.stringify(metadata)], { type: "application/json" })
+  const jsonForm = new FormData()
+  jsonForm.append("file", blob, "metadata.json")
+  jsonForm.append("name", nftData.name)
+  jsonForm.append("network", "public")
+
+  const jsonUploadRes = await $fetch<{ data: PinataUploadResponse }>("https://uploads.pinata.cloud/v3/files", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${pinataJwt}`,
+    },
+    body: jsonForm,
+  })
+
+  return jsonUploadRes.data
 }
 
 const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: writeContractTx })
