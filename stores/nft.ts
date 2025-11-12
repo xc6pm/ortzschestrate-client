@@ -2,13 +2,18 @@ import { readContract } from "@wagmi/core"
 import { useAccount } from "@wagmi/vue"
 import type { Abi } from "viem"
 import type { Deployment } from "~/types/Deployment"
+import type { NFTDataResolver } from "~/types/NFTDataResolver"
+import { MoralisNFTResolver } from "~/web3/MoralisNFTResolver"
 
 export const useNFTStore = defineStore("nftStore", () => {
   const userStore = useUserStore()
   const blockchainAccount = useAccount()
   const { config } = useWagmi()
   const deployment = ref<Deployment | null>(null)
+  const nftDataResolver = ref<NFTDataResolver | null>()
   const isUserNFTOwner = ref(false)
+
+  const { moralisApiKey, ipfsGateway } = useRuntimeConfig().public
 
   // Use this inside this store to ensure we try to load the deployment if it has failed before.
   const tryLoadDeployment: () => Promise<Deployment | null> = async () => {
@@ -48,6 +53,8 @@ export const useNFTStore = defineStore("nftStore", () => {
       return
     }
 
+    nftDataResolver.value = new MoralisNFTResolver(moralisApiKey, ipfsGateway, blockchainAccount.chain.value!.name)
+
     console.log("depl json", depl)
     const res = await readContract(config, {
       abi: depl.abi as Abi,
@@ -61,5 +68,5 @@ export const useNFTStore = defineStore("nftStore", () => {
     isUserNFTOwner.value = (res as `0x${string}`) === blockchainAccount.address.value
   })
 
-  return { deployment, isUserNFTOwner }
+  return { deployment, isUserNFTOwner, nftDataResolver }
 })

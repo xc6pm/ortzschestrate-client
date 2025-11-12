@@ -17,6 +17,8 @@ export default defineNuxtConfig({
       serverAddress: process.env.SERVER_ADDRESS,
       reownProjectId: process.env.REOWN_PROJECT_ID,
       pinataJwt: process.env.PINATA_JWT,
+      ipfsGateway: process.env.IPFS_GATEWAY,
+      moralisApiKey: process.env.MORALIS_API_KEY,
     },
   },
 

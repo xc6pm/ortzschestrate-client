@@ -1,7 +1,7 @@
 <script setup lang="ts">
 interface Props {
   title: string
-  price: string
+  price: string | "owned"
   image: string
 }
 
@@ -26,7 +26,7 @@ const handleBuy = () => {
     <div class="p-4">
       <h3 class="text-lg font-semibold mb-2">{{ title }}</h3>
 
-      <div class="flex items-center justify-between">
+      <div v-if="price !== 'owned'" class="flex items-center justify-between">
         <div class="flex items-center gap-1">
           <span class="text-2xl font-bold text-green-400">{{ price }}</span>
           <span class="text-sm text-gray-500">POL</span>

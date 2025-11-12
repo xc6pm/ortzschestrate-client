@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useAccount } from "@wagmi/vue"
+import type { NFTItem } from "~/types/NFTDataResolver"
+
 // Mock data for NFTs - replace with actual contract data later
-const nftItems = ref([
+const listedItems = ref([
   {
     id: 1,
     title: "Chess King #001",
@@ -40,17 +43,43 @@ const nftItems = ref([
 ])
 
 const nftStore = useNFTStore()
+const account = useAccount()
+
+const ownedItems = ref<NFTItem[]>([])
+watchEffect(async () => {
+  if (nftStore.nftDataResolver && account.address.value && nftStore.deployment?.address) {
+    ownedItems.value = await nftStore.nftDataResolver.getNFTsByWallet(account.address.value, [
+      nftStore.deployment.address,
+    ])
+  } else {
+    ownedItems.value = []
+  }
+})
 </script>
 
 <template>
-  <div class="flex justify-end mb-4 mt-4">
-    <UButton v-if="nftStore.isUserNFTOwner" label="Mint" variant="outline" to="/shop/mint" />
+  <div v-if="nftStore.isUserNFTOwner" class="flex justify-end mb-4 mt-4">
+    <UButton label="Mint" variant="outline" to="/shop/mint" />
   </div>
 
-  <div class="pb-8">
+  <h2 v-if="ownedItems.length">Owned Items</h2>
+
+  <div v-if="ownedItems.length" class="pb-8">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <ShopItemCard
-        v-for="item in nftItems"
+        v-for="item in ownedItems"
+        :key="item.tokenId.toString()"
+        :title="item.metadata.name"
+        :price="'owned'"
+        :image="item.metadata.image"
+      />
+    </div>
+  </div>
+
+  <div class="py-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <ShopItemCard
+        v-for="item in listedItems"
         :key="item.id"
         :title="item.title"
         :price="item.price"

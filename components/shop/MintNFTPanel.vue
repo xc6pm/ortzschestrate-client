@@ -36,6 +36,7 @@ const toast = useToast()
 const account = useAccount()
 const { data: writeContractTx, error: writeContractErr, writeContract } = useWriteContract()
 const { urlToTx } = useEtherscanUrlConstructor()
+const { chains } = useWagmi()
 
 const handleMint = async () => {
   loading.value = true
@@ -82,9 +83,11 @@ const mint = async () => {
     return
   }
 
+  console.log("calling safeMint", account.address.value, uploadRes, nftStore.deployment.address, chains[0].id)
   writeContract({
     address: nftStore.deployment!.address,
     abi: nftStore.deployment!.abi as Abi,
+    chainId: chains[0].id,
     functionName: "safeMint",
     args: [account.address.value, uploadRes.cid],
   })
@@ -96,7 +99,7 @@ const uploadToPinata = async () => {
   const pinataJwt = useRuntimeConfig().public.pinataJwt
   const imageForm = new FormData()
   imageForm.append("file", nftData.image!)
-  imageForm.append("name", nftData.name)
+  imageForm.append("name", nftData.name + "-img")
   imageForm.append("network", "public")
 
   const imageUploadRes = await $fetch<{ data: PinataUploadResponse }>("https://uploads.pinata.cloud/v3/files", {
@@ -116,7 +119,7 @@ const uploadToPinata = async () => {
   const blob = new Blob([JSON.stringify(metadata)], { type: "application/json" })
   const jsonForm = new FormData()
   jsonForm.append("file", blob, "metadata.json")
-  jsonForm.append("name", nftData.name)
+  jsonForm.append("name", nftData.name + "-metadata")
   jsonForm.append("network", "public")
 
   const jsonUploadRes = await $fetch<{ data: PinataUploadResponse }>("https://uploads.pinata.cloud/v3/files", {

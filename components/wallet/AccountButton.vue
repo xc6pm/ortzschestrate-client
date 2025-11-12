@@ -90,7 +90,7 @@ const dropdownItems = ref([
     {
       label: "disconnect",
       onSelect: () => {
-        wagmiAdapter.disconnect()
+        wagmiAdapter.disconnect({id: account.address.value})
       },
     },
   ],
