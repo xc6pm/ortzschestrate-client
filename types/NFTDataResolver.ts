@@ -2,7 +2,7 @@ import type { Hex } from "viem"
 
 export interface OnChainItem {
   token_uri: string
-  token_id: BigInt
+  token_id: bigint
 }
 
 export type IPFSItem = {
@@ -13,7 +13,7 @@ export type IPFSItem = {
 }
 
 export type NFTItem = {
-  tokenId: BigInt
+  tokenId: bigint
   tokenUri: string
   metadata: IPFSItem
 }

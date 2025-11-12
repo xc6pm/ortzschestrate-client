@@ -1,5 +1,6 @@
 <script setup lang="ts">
 interface Props {
+  tokenId: bigint
   title: string
   price: string | "owned"
   image: string
@@ -7,14 +8,18 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const idFormatted = computed(() => `#${props.tokenId.toString().padStart(3, "0")}`)
+
 const handleBuy = () => {
   // TODO: Implement NFT purchase logic
   console.log(`Buying ${props.title} for ${props.price} POL`)
 }
+
+const handleSell = () => {}
 </script>
 
 <template>
-  <UCard :ui="{ body: { padding: 'p-0' } }">
+  <UCard>
     <div class="aspect-square overflow-hidden">
       <img
         :src="image"
@@ -23,8 +28,13 @@ const handleBuy = () => {
       />
     </div>
 
-    <div class="p-4">
-      <h3 class="text-lg font-semibold mb-2">{{ title }}</h3>
+    <div>
+      <div :class="price === 'owned' ? ['flex', 'items-center', 'justify-between'] : []">
+        <h3 class="text-lg font-semibold">
+          {{ title }} <span class="text-sm text-gray-500">{{ idFormatted }}</span>
+        </h3>
+        <UButton v-if="price === 'owned'" class="mt-4" color="primary" @click="handleSell">Sell Now</UButton>
+      </div>
 
       <div v-if="price !== 'owned'" class="flex items-center justify-between">
         <div class="flex items-center gap-1">
