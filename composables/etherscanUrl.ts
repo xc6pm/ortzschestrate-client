@@ -8,6 +8,10 @@ export const useEtherscanUrlConstructor = () => {
       return `https://sepolia.etherscan.io/tx/${txHash}`
     }
 
+    if (toValue(account.chainId) === 80002) {
+      return `https://amoy.polygonscan.com/tx/${txHash}`
+    }
+
     console.error(`Etherscan url for a network with id ${toValue(account.chainId)} is not defined.`)
     return ""
   }

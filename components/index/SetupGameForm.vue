@@ -34,7 +34,7 @@ const validate = (state: Partial<{ wagered: boolean; stake: number }>): FormErro
     if (state.stake! <= 0)
       return [{ name: "stake", message: "Must specify a stake amount greater than " + minStakeAmount }]
     else if (state.stake! > contractState.stakesEth)
-      return [{ name: "stake", message: `Cannot specify that amount. You have ${contractState.stakesEth} ETH.` }]
+      return [{ name: "stake", message: `Cannot specify that amount. You have ${contractState.stakesEth} POL.` }]
   } else if (state.stake! > 0) {
     return [{ name: "stake", message: "Can't specify stake when the game is non-wagered." }]
   }

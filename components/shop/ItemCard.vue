@@ -9,7 +9,7 @@ const props = defineProps<Props>()
 
 const handleBuy = () => {
   // TODO: Implement NFT purchase logic
-  console.log(`Buying ${props.title} for ${props.price} ETH`)
+  console.log(`Buying ${props.title} for ${props.price} POL`)
 }
 </script>
 
@@ -29,7 +29,7 @@ const handleBuy = () => {
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-1">
           <span class="text-2xl font-bold text-green-400">{{ price }}</span>
-          <span class="text-sm text-gray-500">ETH</span>
+          <span class="text-sm text-gray-500">POL</span>
         </div>
 
         <UButton @click="handleBuy" color="primary"> Buy Now </UButton>

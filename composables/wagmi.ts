@@ -3,9 +3,15 @@ import type { AppKitNetwork } from "@reown/appkit/networks"
 import { createConfig, injected } from "@wagmi/vue"
 import { metaMask, safe, walletConnect } from "@wagmi/vue/connectors"
 import { defineChain, http } from "viem"
-import { hardhat, sepolia, type Chain } from "viem/chains"
+import { hardhat, polygonAmoy, type Chain } from "viem/chains"
 
-let wagmiProps: { wagmiAdapter: WagmiAdapter; projectId: string; config: any; networks: AppKitNetwork[] } | null = null
+let wagmiProps: {
+  wagmiAdapter: WagmiAdapter
+  projectId: string
+  config: any
+  networks: AppKitNetwork[]
+  chains: Chain[]
+} | null = null
 
 const initWagmi = (projectId: string) => {
   let hardhatLocalhost: Chain | null = null
@@ -27,11 +33,12 @@ const initWagmi = (projectId: string) => {
   //   })
   // }
 
-  const chains: [Chain, ...Chain[]] = hardhatLocalhost ? [hardhatLocalhost, sepolia] : [sepolia]
+  // const chains: [Chain, ...Chain[]] = hardhatLocalhost ? [hardhatLocalhost, sepolia] : [sepolia]
+  const chains: [Chain, ...Chain[]] = [polygonAmoy]
   // const transports = hardhatLocalhost
   // ? { [sepolia.id]: http(), [hardhatLocalhost.id]: http() }
   // : { [sepolia.id]: http() }
-  const transports = { [sepolia.id]: http() }
+  const transports = { [polygonAmoy.id]: http() }
 
   const config = createConfig({
     chains,
@@ -46,7 +53,7 @@ const initWagmi = (projectId: string) => {
     projectId,
   })
 
-  wagmiProps = { wagmiAdapter, projectId, config, networks }
+  wagmiProps = { wagmiAdapter, projectId, config, networks, chains }
 }
 
 export const useWagmi = () => {

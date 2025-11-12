@@ -118,7 +118,7 @@ const errors = ref<FormError<string>[]>([])
 const validate = (state: Partial<{ amount: number }>): FormError<string>[] => {
   const minimumAmount = 0.0001
   if (state.amount! < minimumAmount)
-    errors.value = [{ name: "amount", message: `The minimum is ${minimumAmount} ETH.` }]
+    errors.value = [{ name: "amount", message: `The minimum is ${minimumAmount} POL.` }]
   else errors.value = []
   return errors.value
 }
@@ -132,7 +132,7 @@ validate(modalState)
       {{ account.address.value?.substring(0, 5) }}...{{
         account.address.value?.substring(account.address.value.length - 4, account.address.value.length)
       }}
-      ({{ contractState.stakesEth }} ETH)
+      ({{ contractState.stakesEth }} POL)
     </UButton>
   </UDropdownMenu>
 
