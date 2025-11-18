@@ -1,7 +1,7 @@
 import { readContract } from "@wagmi/core"
 import { useAccount } from "@wagmi/vue"
 import type { Abi } from "viem"
-import type { Deployment } from "~/types/Deployment"
+import { useDeployment } from "~/composables/deployment"
 import type { NFTDataResolver } from "~/types/NFTDataResolver"
 import { MoralisNFTResolver } from "~/web3/MoralisNFTResolver"
 
@@ -9,28 +9,11 @@ export const useNFTStore = defineStore("nftStore", () => {
   const userStore = useUserStore()
   const blockchainAccount = useAccount()
   const { config } = useWagmi()
-  const deployment = ref<Deployment | null>(null)
+  const { nietzschessNFTDepl: deployment } = useDeployment()
   const nftDataResolver = ref<NFTDataResolver | null>()
   const isUserNFTOwner = ref(false)
 
   const { moralisApiKey, ipfsGateway } = useRuntimeConfig().public
-
-  // Use this inside this store to ensure we try to load the deployment if it has failed before.
-  const tryLoadDeployment: () => Promise<Deployment | null> = async () => {
-    if (deployment.value) return deployment.value
-
-    const nftContract = "NietzschessNFT"
-    const nftContractDeployment = `/deployment/${nftContract}.json`
-    try {
-      const depl = await $fetch<Deployment>(nftContractDeployment)
-      deployment.value = Object.freeze(depl)
-    } catch {
-      deployment.value = null
-    }
-    return deployment.value
-  }
-
-  tryLoadDeployment()
 
   watchEffect(async () => {
     if (!userStore.user || !blockchainAccount.address?.value) {
@@ -46,8 +29,7 @@ export const useNFTStore = defineStore("nftStore", () => {
       return
     }
 
-    const depl = await tryLoadDeployment()
-    if (!depl) {
+    if (!deployment.value) {
       console.log("Deployment not found")
       isUserNFTOwner.value = false
       return
@@ -55,10 +37,9 @@ export const useNFTStore = defineStore("nftStore", () => {
 
     nftDataResolver.value = new MoralisNFTResolver(moralisApiKey, ipfsGateway, blockchainAccount.chain.value!.name)
 
-    console.log("depl json", depl)
     const res = await readContract(config, {
-      abi: depl.abi as Abi,
-      address: depl.address,
+      abi: deployment.value.abi as Abi,
+      address: deployment.value.address,
       functionName: "owner",
       args: [],
     })

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useEtherscanUrlConstructor } from "#imports"
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "@wagmi/vue"
 import type { Abi } from "viem"
 
@@ -35,7 +34,6 @@ const nftStore = useNFTStore()
 const toast = useToast()
 const account = useAccount()
 const { data: writeContractTx, error: writeContractErr, writeContract } = useWriteContract()
-const { urlToTx } = useEtherscanUrlConstructor()
 const { chains } = useWagmi()
 
 const handleMint = async () => {
@@ -188,7 +186,7 @@ const resetForm = () => {
         </UFormField>
 
         <UFormField label="Image" name="image" class="mb-4">
-          <UFileUpload v-model="nftData.image" accept="image/*" />
+          <UFileUpload v-model="nftData.image" accept="image/*" :disabled="loading" />
         </UFormField>
 
         <!-- Attributes Section -->
@@ -234,67 +232,11 @@ const resetForm = () => {
       </UForm>
     </UCard>
 
-    <!-- Transaction Status Card -->
-    <UCard v-if="isConfirming || isConfirmed" class="mt-4">
-      <!-- Transaction in Progress -->
-      <div v-if="isConfirming" class="flex items-center gap-3">
-        <UIcon name="i-heroicons-arrow-path" class="animate-spin text-blue-500" />
-        <div>
-          <p class="font-medium">Transaction in progress</p>
-          <p class="text-sm text-gray-500">
-            tx:
-            <a
-              :href="urlToTx(writeContractTx!)"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="underline hover:text-blue-400 cursor-pointer"
-            >
-              {{ `${writeContractTx!.slice(0, 6)}...${writeContractTx!.slice(-4)}` }}
-            </a>
-          </p>
-        </div>
-      </div>
-
-      <!-- Transaction Confirmed (Success) -->
-      <div v-else-if="isConfirmed && !writeContractErr" class="flex items-center gap-3">
-        <UIcon name="i-heroicons-check-circle" class="text-green-500 text-2xl" />
-        <div>
-          <p class="font-medium text-green-600">Transaction confirmed!</p>
-          <p class="text-sm text-gray-500">
-            tx:
-            <a
-              :href="urlToTx(writeContractTx!)"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="underline hover:text-blue-400 cursor-pointer"
-            >
-              {{ `${writeContractTx!.slice(0, 6)}...${writeContractTx!.slice(-4)}` }}
-            </a>
-          </p>
-        </div>
-      </div>
-
-      <!-- Transaction Failed -->
-      <div v-else-if="isConfirmed && writeContractErr" class="flex items-start gap-3">
-        <UIcon name="i-heroicons-x-circle" class="text-red-500 text-2xl shrink-0" />
-        <div class="flex-1">
-          <p class="font-medium text-red-600">Transaction failed</p>
-          <p class="text-sm text-gray-500 mb-2">
-            tx:
-            <a
-              :href="urlToTx(writeContractTx!)"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="underline hover:text-blue-400 cursor-pointer"
-            >
-              {{ `${writeContractTx!.slice(0, 6)}...${writeContractTx!.slice(-4)}` }}
-            </a>
-          </p>
-          <p class="text-sm text-red-600 bg-red-50 p-2 rounded">
-            {{ writeContractErr.message || writeContractErr }}
-          </p>
-        </div>
-      </div>
-    </UCard>
+    <ShopTxStatusCard
+      :is-confirming="isConfirming"
+      :is-confirmed="isConfirmed"
+      :tx-id="writeContractTx"
+      :tx-err="writeContractErr"
+    />
   </main>
 </template>

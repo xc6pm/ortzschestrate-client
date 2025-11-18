@@ -16,12 +16,10 @@ export const useUserStore = defineStore("userStore", () => {
       }
     } catch (error: any) {
       user.value = null
-      if (error.message.includes("401")) {
-        toast.add({ title: "Unauthorized access. Please log in.", color: "error" })
-      } else if (error.message.include("500")) {
+      if (error.message.includes("500")) {
         toast.add({
-          title: "Unauthorized access. Please log in.",
-          description: "Identity db connection failed",
+          title: "Identity db connection failed",
+          description: "",
           color: "error",
         })
       }
