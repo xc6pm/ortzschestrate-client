@@ -1,7 +1,6 @@
 import { readContract } from "@wagmi/core"
 import { useAccount } from "@wagmi/vue"
 import type { Abi } from "viem"
-import { useDeployment } from "~/composables/deployment"
 import type { NFTDataResolver } from "~/types/NFTDataResolver"
 import { GoldRushNFTResolver } from "~/web3/GoldRushNFTResolver"
 import { MoralisNFTResolver } from "~/web3/MoralisNFTResolver"
@@ -10,15 +9,23 @@ export const useNFTStore = defineStore("nftStore", () => {
   const userStore = useUserStore()
   const blockchainAccount = useAccount()
   const { config, networks } = useWagmi()
-  const { nietzschessNFTDepl: deployment } = useDeployment()
+  const { nietzschessNFTDepl: deployment } = storeToRefs(useDeploymentStore())
   const nftDataResolver = ref<NFTDataResolver | null>()
   const isUserNFTOwner = ref(false)
 
   const { moralisApiKey, goldRushApiKey, ipfsGateway } = useRuntimeConfig().public
+  // MoralisNFTResolver can be initialized here, because it doesn't depend on contract abi.
+  // If GoldRushNFTResolver is to be used it must be initilized after nft abi is fetched.
   // nftDataResolver.value = new MoralisNFTResolver(moralisApiKey, ipfsGateway, networks[0].name)
-  nftDataResolver.value = new GoldRushNFTResolver(goldRushApiKey, ipfsGateway, networks[0].id.toString())
 
   watchEffect(async () => {
+    if (!deployment.value) {
+      console.log("Deployment not found")
+      isUserNFTOwner.value = false
+      return
+    }
+    nftDataResolver.value = new GoldRushNFTResolver(goldRushApiKey, ipfsGateway, networks[0].id.toString())
+
     if (!userStore.user || !blockchainAccount.address?.value) {
       console.log("not logged in")
       isUserNFTOwner.value = false
@@ -28,12 +35,6 @@ export const useNFTStore = defineStore("nftStore", () => {
     const walletNotVerified = userStore.user.verifiedWallet !== blockchainAccount.address.value
     if (walletNotVerified) {
       console.log("wallet not verified")
-      isUserNFTOwner.value = false
-      return
-    }
-
-    if (!deployment.value) {
-      console.log("Deployment not found")
       isUserNFTOwner.value = false
       return
     }

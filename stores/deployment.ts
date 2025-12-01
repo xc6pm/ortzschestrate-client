@@ -1,9 +1,9 @@
 import type { Deployment } from "~/types/Deployment"
 
-export const useDeployment = () => {
-  const bettingDepl = useState<Deployment | null>("bettingDepl", () => null)
-  const nietzschessNFTDepl = useState<Deployment | null>("nftDepl", () => null)
-  const marketplaceDepl = useState<Deployment | null>("marketDepl", () => null)
+export const useDeploymentStore = defineStore("deploymentStore", () => {
+  const bettingDepl = ref<Deployment | null>(null)
+  const nietzschessNFTDepl = ref<Deployment | null>(null)
+  const marketplaceDepl = ref<Deployment | null>(null)
 
   const { isOnline } = useNetworkStatus()
 
@@ -39,4 +39,4 @@ export const useDeployment = () => {
   })
 
   return { bettingDepl, nietzschessNFTDepl, marketplaceDepl }
-}
+})

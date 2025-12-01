@@ -9,7 +9,7 @@ import type { Abi, Hex } from "viem"
  */
 export const useEnsureItemApprovedForSale = () => {
   const account = useAccount()
-  const { nietzschessNFTDepl, marketplaceDepl } = useDeployment()
+  const { nietzschessNFTDepl, marketplaceDepl } = storeToRefs(useDeploymentStore())
   const wagmi = useWagmi()
   const toast = useToast()
 
