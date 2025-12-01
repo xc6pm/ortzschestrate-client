@@ -19,6 +19,9 @@ export default defineNuxtConfig({
       pinataJwt: process.env.PINATA_JWT,
       ipfsGateway: process.env.IPFS_GATEWAY,
       moralisApiKey: process.env.MORALIS_API_KEY,
+      nftMarketplaceSubgraphUrl: process.env.NFT_MARKETPLACE_SUBGRAPH_URL,
+      theGraphStudioApiKey: process.env.THE_GRAPH_STUDIO_API_KEY,
+      goldRushApiKey: process.env.GOLDRUSH_API_KEY,
     },
   },
 
@@ -45,7 +48,7 @@ export default defineNuxtConfig({
 
   ssr: false,
 
-  plugins: ["~/plugins/connectWallet.client.ts"],
+  plugins: ["~/plugins/connectWallet.client.ts", "~/plugins/urql.ts"],
   modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/icon", "@nuxt/image", "@vueuse/nuxt"],
   css: ["~/assets/css/main.css"],
   ui: {

@@ -11,6 +11,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+console.log("props.price", props.price)
 
 const emit = defineEmits(["newTx"])
 
@@ -23,7 +24,7 @@ const handleBuy = () => {
 
 const account = useAccount()
 const showPriceInput = ref<boolean>(false)
-const price = ref<number>(0)
+const salePrice = ref<number>(0)
 const toast = useToast()
 const minPrice = 0.01
 const { marketplaceDepl, nietzschessNFTDepl } = useDeployment()
@@ -46,7 +47,7 @@ const handleSell = async () => {
     return
   }
 
-  if (price.value < minPrice) {
+  if (salePrice.value < minPrice) {
     toast.add({ title: `Price must be greater than ${minPrice} POL.` })
     return
   }
@@ -62,7 +63,7 @@ const handleSell = async () => {
     account: account.address.value,
     chainId: chains[0].id,
     functionName: "listItem",
-    args: [nietzschessNFTDepl.value!.address, props.tokenId, parseEther(price.value.toString()), ""],
+    args: [nietzschessNFTDepl.value!.address, props.tokenId, parseEther(salePrice.value.toString()), ""],
   })
   console.log("listItem called")
 
@@ -70,7 +71,7 @@ const handleSell = async () => {
 }
 
 const cancelSell = () => {
-  price.value = 0
+  salePrice.value = 0
   showPriceInput.value = false
 }
 </script>
@@ -111,7 +112,7 @@ const cancelSell = () => {
 
       <div v-if="showPriceInput" class="w-full flex mt-2">
         <UInputNumber
-          v-model="price"
+          v-model="salePrice"
           autofocus
           :disabled="isPending"
           :min="minPrice"

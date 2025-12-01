@@ -1,47 +1,10 @@
 <script setup lang="ts">
+import { useQuery } from "@urql/vue"
 import { useAccount } from "@wagmi/vue"
-import type { NFTItem } from "~/types/NFTDataResolver"
+import { formatEther, type Hex } from "viem"
+import type { Listing } from "~/types/Listing"
+import type { NFTItem, SaleItem } from "~/types/NFTDataResolver"
 import type { TxStatus } from "~/types/TxStatus"
-
-// // Mock data for NFTs - replace with actual contract data later
-// const listedItems = ref([
-//   {
-//     id: 1n,
-//     title: "Chess King #001",
-//     price: "0.05",
-//     image: "https://placehold.co/400x400/1f2937/10b981?text=King+%23001",
-//   },
-//   {
-//     id: 2n,
-//     title: "Chess Queen #002",
-//     price: "0.08",
-//     image: "https://placehold.co/400x400/1f2937/10b981?text=Queen+%23002",
-//   },
-//   {
-//     id: 3n,
-//     title: "Chess Knight #003",
-//     price: "0.03",
-//     image: "https://placehold.co/400x400/1f2937/10b981?text=Knight+%23003",
-//   },
-//   {
-//     id: 4n,
-//     title: "Chess Rook #004",
-//     price: "0.04",
-//     image: "https://placehold.co/400x400/1f2937/10b981?text=Rook+%23004",
-//   },
-//   {
-//     id: 5n,
-//     title: "Chess Bishop #005",
-//     price: "0.03",
-//     image: "https://placehold.co/400x400/1f2937/10b981?text=Bishop+%23005",
-//   },
-//   {
-//     id: 6n,
-//     title: "Chess Pawn #006",
-//     price: "0.01",
-//     image: "https://placehold.co/400x400/1f2937/10b981?text=Pawn+%23006",
-//   },
-// ])
 
 const nftStore = useNFTStore()
 const account = useAccount()
@@ -64,7 +27,70 @@ const handleNewTx = (tx: TxStatus) => {
   txs.push(tx)
 }
 
-const listedItems = []
+console.log("before useQuery")
+
+const { data: subgraphData } = await useQuery<{ activeListings: { id: string; listing: Listing }[] }>({
+  query:
+    "{activeListings(first: 20 orderBy: id orderDirection: desc) { id listing { id nftContract tokenId price metadata listedAt updatedAt seller {id}}}}",
+  requestPolicy: "network-only",
+  variables: {},
+})
+
+const listings = ref<SaleItem[]>([])
+
+watchEffect(async () => {
+  if (subgraphData.value && nftStore.nftDataResolver) {
+    console.log("tryna fetch")
+    const nftItems = await nftStore.nftDataResolver.getNFTsById(
+      subgraphData.value.activeListings.map((al) => ({
+        tokenId: al.listing.tokenId,
+        contractAddress: al.listing.nftContract,
+      }))
+    )
+
+    const listingsToShow: SaleItem[] = []
+    for (let i = 0; i < nftItems.length; i++) {
+      const subgraphItem = subgraphData.value.activeListings[i].listing
+
+      const itemOwned = (subgraphItem.seller.id as Hex).toLowerCase() === account.address.value?.toLowerCase()
+      if (itemOwned) {
+        continue
+      }
+
+      const nftItem = nftItems[i]
+      listingsToShow.push({
+        ...nftItem,
+        priceWei: subgraphItem.price,
+        priceEth: formatEther(BigInt(subgraphItem.price)),
+        listedAt: subgraphItem.listedAt,
+        updatedAt: subgraphItem.updatedAt,
+        seller: subgraphItem.seller.id as Hex,
+        isOwned: itemOwned,
+      })
+    }
+
+    listings.value = listingsToShow
+  } else {
+    listings.value = []
+  }
+})
+
+// const {
+//   state: listings,
+//   isReady,
+//   isLoading,
+// } = useAsyncState(() => {
+//   console.log("inside useAsyncState")
+
+//   return subgraphData.value && nftStore.nftDataResolver
+//     ? nftStore.nftDataResolver.getNFTsById(
+//         subgraphData.value.activeListings.map((al) => ({
+//           tokenId: al.listing.id,
+//           contractAddress: al.listing.nftContract,
+//         }))
+//       )
+//     : Promise.resolve([])
+// }, [], {  watch: [subgraphData, nftStore.nftDataResolver] })
 </script>
 
 <template>
@@ -102,13 +128,13 @@ const listedItems = []
   <div class="my-8">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <ShopItemCard
-        v-for="item in listedItems"
-        :key="item.id.toString()"
-        :token-id="item.id"
-        :title="item.title"
-        :price="item.price"
-        :image="item.image"
-        :is-owned="false"
+        v-for="item in listings"
+        :key="item.tokenId.toString()"
+        :token-id="item.tokenId"
+        :title="item.metadata.name"
+        :price="item.priceEth"
+        :image="item.metadata.image"
+        :is-owned="item.isOwned"
       />
     </div>
   </div>

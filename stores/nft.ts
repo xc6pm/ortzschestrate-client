@@ -3,17 +3,19 @@ import { useAccount } from "@wagmi/vue"
 import type { Abi } from "viem"
 import { useDeployment } from "~/composables/deployment"
 import type { NFTDataResolver } from "~/types/NFTDataResolver"
+import { GoldRushNFTResolver } from "~/web3/GoldRushNFTResolver"
 import { MoralisNFTResolver } from "~/web3/MoralisNFTResolver"
 
 export const useNFTStore = defineStore("nftStore", () => {
   const userStore = useUserStore()
   const blockchainAccount = useAccount()
-  const { config } = useWagmi()
+  const { config, networks } = useWagmi()
   const { nietzschessNFTDepl: deployment } = useDeployment()
   const nftDataResolver = ref<NFTDataResolver | null>()
   const isUserNFTOwner = ref(false)
 
-  const { moralisApiKey, ipfsGateway } = useRuntimeConfig().public
+  const { moralisApiKey, goldRushApiKey, ipfsGateway } = useRuntimeConfig().public
+  nftDataResolver.value = new MoralisNFTResolver(moralisApiKey, ipfsGateway, networks[0].id.toString())
 
   watchEffect(async () => {
     if (!userStore.user || !blockchainAccount.address?.value) {
@@ -34,8 +36,6 @@ export const useNFTStore = defineStore("nftStore", () => {
       isUserNFTOwner.value = false
       return
     }
-
-    nftDataResolver.value = new MoralisNFTResolver(moralisApiKey, ipfsGateway, blockchainAccount.chain.value!.name)
 
     const res = await readContract(config, {
       abi: deployment.value.abi as Abi,

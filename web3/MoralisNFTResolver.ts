@@ -14,8 +14,6 @@ export class MoralisNFTResolver implements NFTDataResolver {
   }
 
   async getNFTsByWallet(walletAddress: Hex, collections: Hex[]): Promise<NFTItem[]> {
-    console.log("apiKey", this.apiKey)
-    console.log("chain", this.chain)
     const options = {
       method: "GET",
       headers: {
@@ -30,7 +28,6 @@ export class MoralisNFTResolver implements NFTDataResolver {
     }
 
     const rawRes = await fetch(fetchUrl, options)
-    console.log("rawRes", rawRes)
 
     if (!rawRes.ok) {
       throw new Error(rawRes.status + ":" + rawRes.statusText)
@@ -40,11 +37,57 @@ export class MoralisNFTResolver implements NFTDataResolver {
     // https://docs.moralis.com/web3-data-api/evm/reference/get-wallet-nfts
     const { result } = (await rawRes.json()) as { result: OnChainItem[] }
 
-    console.log("OnChainItems", result)
-
     const displayItems = await this.pinataResolver.resolveDisplayInfo(result)
 
-    console.log("after displayItems")
+    return displayItems
+  }
+
+  async getNFTsById(items: { tokenId: string; contractAddress: string }[]): Promise<NFTItem[]> {
+    if (items.length > 25) {
+      throw new Error("Maximum of 25 token IDs allowed per request. This is a Moralis limitation.")
+    }
+
+    const options = {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+        "x-api-key": this.apiKey,
+      },
+      body: JSON.stringify({
+        tokens: items.map(({ tokenId, contractAddress }) => ({
+          token_address: contractAddress,
+          token_id: tokenId,
+        })),
+      }),
+    }
+    console.log(
+      "fetching....",
+      options.body,
+      JSON.stringify({
+        tokens: items.map(({ tokenId, contractAddress }) => ({
+          token_address: contractAddress,
+          token_id: tokenId,
+        })),
+        normalizeMetadata: false,
+        media_items: false,
+      })
+    )
+
+    const rawRes = await fetch(
+      `https://deep-index.moralis.io/api/v2.2/nft/getMultipleNFTs?chain=polygon%20amoy`,
+      options
+    )
+
+    console.log("rawRes...")
+
+    if (!rawRes.ok) {
+      throw new Error(rawRes.status + ":" + rawRes.statusText)
+    }
+
+    const result = (await rawRes.json()) as OnChainItem[]
+
+    const displayItems = await this.pinataResolver.resolveDisplayInfo(result)
 
     return displayItems
   }

@@ -18,6 +18,16 @@ export type NFTItem = {
   metadata: IPFSItem
 }
 
+export type SaleItem = NFTItem & {
+  priceWei: string
+  priceEth: string
+  listedAt: string
+  updatedAt: string
+  seller: Hex
+  isOwned: boolean
+}
+
 export interface NFTDataResolver {
   getNFTsByWallet(walletAddress: Hex, collections?: Hex[]): Promise<NFTItem[]>
+  getNFTsById(items: { tokenId: string; contractAddress: string }[]): Promise<NFTItem[]>
 }
