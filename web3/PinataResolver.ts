@@ -21,7 +21,6 @@ export class PinataResolver {
         const jsonCid = item.token_uri.substring(7)
         console.log("cid", jsonCid)
         const fetchUrl = `${this.ipfsGateway}/ipfs/${jsonCid}`
-        console.log("fetchUrl", fetchUrl)
 
         return $fetch<IPFSItem>(fetchUrl, { method: "GET" }).then((ipfsItem) => {
           console.log("ipfs item fetched", ipfsItem)

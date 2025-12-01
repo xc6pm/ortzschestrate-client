@@ -8,6 +8,8 @@ interface Props {
   price: string
   image: string
   isOwned: boolean
+  canBuy?: boolean
+  listed?: boolean
 }
 
 const props = defineProps<Props>()
@@ -87,12 +89,12 @@ const cancelSell = () => {
     </div>
 
     <div>
-      <div :class="isOwned ? ['flex', 'items-center', 'justify-between'] : []">
+      <div :class="isOwned && !listed ? ['flex', 'items-center', 'justify-between'] : []">
         <h3 class="text-lg font-semibold">
           {{ title }} <span class="text-sm text-gray-500">{{ idFormatted }}</span>
         </h3>
         <div>
-          <UButton v-if="isOwned" :disabled="isPending" class="mt-4" color="primary" @click="handleSell"
+          <UButton v-if="isOwned && !listed" :disabled="isPending" class="mt-4" color="primary" @click="handleSell"
             >Sell Now</UButton
           >
           <UButton v-if="showPriceInput" :disabled="isPending" class="mt-4 ml-0.5" color="error" @click="cancelSell"
@@ -101,13 +103,13 @@ const cancelSell = () => {
         </div>
       </div>
 
-      <div v-if="!isOwned" class="flex items-center justify-between">
+      <div v-if="price" class="flex items-center justify-between">
         <div class="flex items-center gap-1">
           <span class="text-2xl font-bold text-green-400">{{ price }}</span>
           <span class="text-sm text-gray-500">POL</span>
         </div>
 
-        <UButton @click="handleBuy" color="primary"> Buy Now </UButton>
+        <UButton @click="handleBuy" color="primary" :disabled="!canBuy"> Buy Now </UButton>
       </div>
 
       <div v-if="showPriceInput" class="w-full flex mt-2">

@@ -15,7 +15,8 @@ export const useNFTStore = defineStore("nftStore", () => {
   const isUserNFTOwner = ref(false)
 
   const { moralisApiKey, goldRushApiKey, ipfsGateway } = useRuntimeConfig().public
-  nftDataResolver.value = new MoralisNFTResolver(moralisApiKey, ipfsGateway, networks[0].id.toString())
+  // nftDataResolver.value = new MoralisNFTResolver(moralisApiKey, ipfsGateway, networks[0].name)
+  nftDataResolver.value = new GoldRushNFTResolver(goldRushApiKey, ipfsGateway, networks[0].id.toString())
 
   watchEffect(async () => {
     if (!userStore.user || !blockchainAccount.address?.value) {

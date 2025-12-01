@@ -7,9 +7,9 @@ export class MoralisNFTResolver implements NFTDataResolver {
   chain: string
   pinataResolver: PinataResolver
 
-  constructor(moralisApiKey: string, ipfsGateway: string, chain: string) {
+  constructor(moralisApiKey: string, ipfsGateway: string, chainName: string) {
     this.apiKey = moralisApiKey
-    this.chain = chain
+    this.chain = encodeURIComponent(chainName)
     this.pinataResolver = new PinataResolver(ipfsGateway)
   }
 

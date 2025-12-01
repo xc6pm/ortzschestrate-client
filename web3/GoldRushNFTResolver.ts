@@ -15,9 +15,9 @@ export class GoldRushNFTResolver implements NFTDataResolver {
   chain: string
   pinataResolver: PinataResolver
 
-  constructor(goldRushApiKey: string, ipfsGateway: string, chain: string) {
+  constructor(goldRushApiKey: string, ipfsGateway: string, chainId: string) {
     this.apiKey = goldRushApiKey
-    this.chain = chain
+    this.chain = chainId
     this.pinataResolver = new PinataResolver(ipfsGateway)
   }
 
