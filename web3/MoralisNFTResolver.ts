@@ -37,7 +37,7 @@ export class MoralisNFTResolver implements NFTDataResolver {
     // https://docs.moralis.com/web3-data-api/evm/reference/get-wallet-nfts
     const { result } = (await rawRes.json()) as { result: OnChainItem[] }
 
-    const displayItems = await this.pinataResolver.resolveDisplayInfo(result)
+    const displayItems = await this.pinataResolver.resolveItemsDisplayInfo(result)
 
     return displayItems
   }
@@ -87,7 +87,7 @@ export class MoralisNFTResolver implements NFTDataResolver {
 
     const result = (await rawRes.json()) as OnChainItem[]
 
-    const displayItems = await this.pinataResolver.resolveDisplayInfo(result)
+    const displayItems = await this.pinataResolver.resolveItemsDisplayInfo(result)
 
     return displayItems
   }

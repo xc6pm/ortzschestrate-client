@@ -5,14 +5,20 @@ import type { NFTItem } from "~/types/NFTDataResolver"
 const nftStore = useNFTStore()
 const account = useAccount()
 
-const ownedItems = ref<NFTItem[]>([])
-watchEffect(async () => {
-  if (nftStore.nftDataResolver && account.address.value && nftStore.deployment?.address) {
-    ownedItems.value = await nftStore.nftDataResolver.getNFTsByWallet(account.address.value, [
-      nftStore.deployment.address,
-    ])
+const fetchOwnedItems = async () => {
+  ownedItems.value = await $fetch<NFTItem[]>(`/functions/nfts/byWallet/${account.address.value}`)
+}
+const ownedItems = ref<NFTItem[] | null>(null)
+if (account.address) {
+  await fetchOwnedItems()
+}
+watch(account.address, async (accountAddress) => {
+  if (accountAddress) {
+    console.log("making api call")
+    await fetchOwnedItems()
+    console.log("api call made", ownedItems.value)
   } else {
-    ownedItems.value = []
+    ownedItems.value = null
   }
 })
 </script>
@@ -27,14 +33,13 @@ watchEffect(async () => {
     </div>
   </div>
 
-  <div v-if="ownedItems.length" class="mb-8">
+  <div v-if="ownedItems?.length" class="mb-8">
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <ShopItemCard
         v-for="item in ownedItems"
         :key="item.tokenId.toString()"
-        :token-id="item.tokenId"
+        :token-id="typeof item.tokenId === 'string' ? BigInt(item.tokenId) : item.tokenId"
         :title="item.metadata.name"
-        :price="'owned'"
         :image="item.metadata.image"
         :is-owned="true"
       />

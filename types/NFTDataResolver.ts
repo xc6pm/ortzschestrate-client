@@ -13,7 +13,7 @@ export type IPFSItem = {
 }
 
 export type NFTItem = {
-  tokenId: bigint
+  tokenId: string | bigint
   tokenUri: string
   metadata: IPFSItem
 }
@@ -24,7 +24,6 @@ export type SaleItem = NFTItem & {
   listedAt: string
   updatedAt: string
   seller: Hex
-  isOwned: boolean
 }
 
 export interface NFTDataResolver {

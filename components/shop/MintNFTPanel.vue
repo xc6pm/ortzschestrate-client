@@ -56,7 +56,7 @@ const handleMint = async () => {
 }
 
 const mint = async () => {
-  let uploadRes: PinataUploadResponse
+  let uploadRes: { cid: string }
   try {
     uploadRes = await uploadToPinata()
   } catch (error) {
@@ -94,41 +94,18 @@ const mint = async () => {
 }
 
 const uploadToPinata = async () => {
-  const pinataJwt = useRuntimeConfig().public.pinataJwt
-  const imageForm = new FormData()
-  imageForm.append("file", nftData.image!)
-  imageForm.append("name", nftData.name + "-img")
-  imageForm.append("network", "public")
+  const form = new FormData()
+  form.append("file", nftData.image!)
+  form.append("name", nftData.name)
+  form.append("description", nftData.description)
+  form.append("attributes", JSON.stringify(attributes.value.map((a) => ({ trait_type: a.key, value: a.value }))))
 
-  const imageUploadRes = await $fetch<{ data: PinataUploadResponse }>("https://uploads.pinata.cloud/v3/files", {
+  const uploadRes = await $fetch<{ cid: string }>("/functions/ipfs/upload", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${pinataJwt}`,
-    },
-    body: imageForm,
+    body: form,
   })
 
-  const metadata = {
-    name: nftData.name,
-    description: nftData.description,
-    image: `ipfs://${imageUploadRes.data.cid}`,
-    attributes: attributes.value.map((a) => ({ trait_type: a.key, value: a.value })),
-  }
-  const blob = new Blob([JSON.stringify(metadata)], { type: "application/json" })
-  const jsonForm = new FormData()
-  jsonForm.append("file", blob, "metadata.json")
-  jsonForm.append("name", nftData.name + "-metadata")
-  jsonForm.append("network", "public")
-
-  const jsonUploadRes = await $fetch<{ data: PinataUploadResponse }>("https://uploads.pinata.cloud/v3/files", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${pinataJwt}`,
-    },
-    body: jsonForm,
-  })
-
-  return jsonUploadRes.data
+  return uploadRes
 }
 
 const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: writeContractTx })
@@ -138,20 +115,6 @@ watchEffect(() => {
     loading.value = false
   }
 })
-
-interface PinataUploadResponse {
-  id: string
-  group_id: string | null
-  name: string
-  cid: string
-  created_at: string
-  size: number
-  number_of_files: number
-  mime_type: string
-  vectorized: false
-  network: "public" | "private"
-  keyvalues: { [key: string]: string }
-}
 
 const resetForm = () => {
   nftData.name = nftData.description = ""

@@ -5,7 +5,7 @@ import { formatEther, parseEther, type Abi, type Hex } from "viem"
 interface Props {
   tokenId: bigint
   title: string
-  price: string
+  price?: string
   image: string
   isOwned: boolean
   canBuy?: boolean
@@ -113,8 +113,9 @@ const cancelSell = () => {
       </div>
 
       <div v-if="showPriceInput" class="w-full flex mt-2">
-        <UInputNumber
+        <UInput
           v-model="salePrice"
+          type="number"
           autofocus
           :disabled="isPending"
           :min="minPrice"

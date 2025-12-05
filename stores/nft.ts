@@ -1,22 +1,13 @@
-import { readContract } from "@wagmi/core"
-import { useAccount } from "@wagmi/vue"
+import { useAccount, type Config } from "@wagmi/vue"
+import { readContract } from "@wagmi/vue/actions"
 import type { Abi } from "viem"
-import type { NFTDataResolver } from "~/types/NFTDataResolver"
-import { GoldRushNFTResolver } from "~/web3/GoldRushNFTResolver"
-import { MoralisNFTResolver } from "~/web3/MoralisNFTResolver"
 
 export const useNFTStore = defineStore("nftStore", () => {
   const userStore = useUserStore()
   const blockchainAccount = useAccount()
-  const { config, networks } = useWagmi()
+  const { config } = useWagmi()
   const { nietzschessNFTDepl: deployment } = storeToRefs(useDeploymentStore())
-  const nftDataResolver = ref<NFTDataResolver | null>()
   const isUserNFTOwner = ref(false)
-
-  const { moralisApiKey, goldRushApiKey, ipfsGateway } = useRuntimeConfig().public
-  // MoralisNFTResolver can be initialized here, because it doesn't depend on contract abi.
-  // If GoldRushNFTResolver is to be used it must be initilized after nft abi is fetched.
-  // nftDataResolver.value = new MoralisNFTResolver(moralisApiKey, ipfsGateway, networks[0].name)
 
   watchEffect(async () => {
     if (!deployment.value) {
@@ -24,7 +15,6 @@ export const useNFTStore = defineStore("nftStore", () => {
       isUserNFTOwner.value = false
       return
     }
-    nftDataResolver.value = new GoldRushNFTResolver(goldRushApiKey, ipfsGateway, networks[0].id.toString())
 
     if (!userStore.user || !blockchainAccount.address?.value) {
       console.log("not logged in")
@@ -39,7 +29,7 @@ export const useNFTStore = defineStore("nftStore", () => {
       return
     }
 
-    const res = await readContract(config, {
+    const res = await readContract(config as Config, {
       abi: deployment.value.abi as Abi,
       address: deployment.value.address,
       functionName: "owner",
@@ -51,5 +41,5 @@ export const useNFTStore = defineStore("nftStore", () => {
     isUserNFTOwner.value = (res as `0x${string}`) === blockchainAccount.address.value
   })
 
-  return { deployment, isUserNFTOwner, nftDataResolver }
+  return { deployment, isUserNFTOwner }
 })

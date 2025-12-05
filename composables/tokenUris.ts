@@ -1,5 +1,5 @@
-import { readContract, writeContract } from "@wagmi/core"
 import { useAccount } from "@wagmi/vue"
+import { readContract } from "@wagmi/vue/actions"
 import type { Hex } from "viem"
 
 export const useResolveTokenUrisFromChain = (

@@ -2,48 +2,28 @@ import { WagmiAdapter } from "@reown/appkit-adapter-wagmi"
 import type { AppKitNetwork } from "@reown/appkit/networks"
 import { createConfig, injected } from "@wagmi/vue"
 import { metaMask, safe, walletConnect } from "@wagmi/vue/connectors"
-import { defineChain, http } from "viem"
-import { hardhat, polygonAmoy, type Chain } from "viem/chains"
+import { http } from "viem"
+import { polygonAmoy, type Chain } from "viem/chains"
 
-let wagmiProps: {
+type WagmiProps = {
   wagmiAdapter: WagmiAdapter
   projectId: string
-  config: any
+  config: ReturnType<typeof createConfig>
   networks: AppKitNetwork[]
   chains: Chain[]
-} | null = null
+}
 
-const initWagmi = (projectId: string) => {
-  let hardhatLocalhost: Chain | null = null
-  // if (import.meta.dev) {
-  //   hardhatLocalhost = defineChain({
-  //     id: 31_337,
-  //     chainNamespace: "eip155",
-  //     caipNetworkId: "eip155:31337",
-  //     name: "Localhost",
-  //     nativeCurrency: {
-  //       decimals: 18,
-  //       name: "Ether",
-  //       symbol: "ETH",
-  //     },
-  //     rpcUrls: {
-  //       default: { http: ["http://127.0.0.1:8545"] },
-  //     },
-  //     testnet: true,
-  //   })
-  // }
+let wagmiProps: WagmiProps | null = null
 
-  // const chains: [Chain, ...Chain[]] = hardhatLocalhost ? [hardhatLocalhost, sepolia] : [sepolia]
+const initWagmi = (projectId: string): WagmiProps => {
   const chains: [Chain, ...Chain[]] = [polygonAmoy]
-  // const transports = hardhatLocalhost
-  // ? { [sepolia.id]: http(), [hardhatLocalhost.id]: http() }
-  // : { [sepolia.id]: http() }
   const transports = { [polygonAmoy.id]: http() }
 
   const config = createConfig({
     chains,
     transports,
-    connectors: [injected(), metaMask(), safe(), walletConnect({ projectId })],
+    connectors: import.meta.server ? [] : [injected(), metaMask(), safe(), walletConnect({ projectId })],
+    ssr: true,
   })
 
   const networks: [AppKitNetwork, ...AppKitNetwork[]] = chains
@@ -53,15 +33,16 @@ const initWagmi = (projectId: string) => {
     projectId,
   })
 
-  wagmiProps = { wagmiAdapter, projectId, config, networks, chains }
+  return { wagmiAdapter, projectId, config, networks, chains }
 }
 
 export const useWagmi = () => {
   const projectId = useRuntimeConfig().public.reownProjectId
   if (!projectId) throw new Error("The wallet button requires a reown project id to work.")
 
-  if (wagmiProps) return wagmiProps
+  if (!wagmiProps) {
+    wagmiProps = initWagmi(projectId)
+  }
 
-  initWagmi(projectId)
-  return wagmiProps!
+  return wagmiProps
 }

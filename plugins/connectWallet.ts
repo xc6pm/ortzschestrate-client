@@ -5,5 +5,5 @@ export default defineNuxtPlugin((nuxtApp) => {
   const queryClient = new QueryClient()
   const { config } = useWagmi()
 
-  nuxtApp.vueApp.use(WagmiPlugin, { config }).use(VueQueryPlugin, { queryClient })
+  nuxtApp.vueApp.use(WagmiPlugin, { config, reconnectOnMount: import.meta.client }).use(VueQueryPlugin, { queryClient })
 })

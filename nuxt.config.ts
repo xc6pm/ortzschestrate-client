@@ -11,27 +11,32 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    "/": { swr: true },
+    "/**": { swr: true },
+    "/auth/**": { swr: true },
+    "/game/**": { ssr: false },
+    "/history/**": { swr: true },
+    "/shop/**": { swr: true },
+    "/shop/owned": { ssr: false },
+    "/functions/ipfs/**": { swr: true, cache: false },
+    "/functions/nfts/**": { swr: true, cache: false },
+    "/functions/nfts/byWallet/**": { swr: true, cache: false },
+  },
+
   runtimeConfig: {
     public: {
       apiUrl: process.env.NUXT_API_URL,
       serverAddress: process.env.SERVER_ADDRESS,
       reownProjectId: process.env.REOWN_PROJECT_ID,
-      pinataJwt: process.env.PINATA_JWT,
       ipfsGateway: process.env.IPFS_GATEWAY,
-      moralisApiKey: process.env.MORALIS_API_KEY,
       nftMarketplaceSubgraphUrl: process.env.NFT_MARKETPLACE_SUBGRAPH_URL,
-      theGraphStudioApiKey: process.env.THE_GRAPH_STUDIO_API_KEY,
-      goldRushApiKey: process.env.GOLDRUSH_API_KEY,
     },
-  },
 
-  nitro: {
-    devProxy: {
-      "/api/**": {
-        target: `${process.env.NUXT_API_URL}/**`,
-        secure: true,
-      },
-    },
+    pinataJwt: process.env.PINATA_JWT,
+    moralisApiKey: process.env.MORALIS_API_KEY,
+    theGraphStudioApiKey: process.env.THE_GRAPH_STUDIO_API_KEY,
+    goldRushApiKey: process.env.GOLDRUSH_API_KEY,
   },
 
   vite: {
@@ -46,9 +51,7 @@ export default defineNuxtConfig({
     },
   },
 
-  ssr: false,
-
-  plugins: ["~/plugins/connectWallet.client.ts", "~/plugins/urql.ts"],
+  plugins: ["~/plugins/connectWallet.ts"],
   modules: ["@pinia/nuxt", "@nuxt/ui", "@nuxt/icon", "@nuxt/image", "@vueuse/nuxt"],
   css: ["~/assets/css/main.css"],
   ui: {

@@ -1,9 +1,11 @@
 import { useAccount } from "@wagmi/vue"
-import { getBlockNumber, readContract, watchContractEvent, type WatchContractEventReturnType } from "@wagmi/core"
+import { getBlockNumber, readContract, watchContractEvent } from "@wagmi/vue/actions"
 import type { Deployment } from "~/types/Deployment"
 import { formatEther, type Abi, type Log } from "viem"
 
-const deploymentArtifact = import.meta.dev ? "/deployment/dev/ORTBet.json" : "/deployment/ORTBet.json"
+type WatchContractEventReturnType = () => void
+
+const deploymentArtifact = "/deployment/ORTBet.json"
 
 export const useContractStateStore = defineStore("contractStateStore", () => {
   const deployment = ref<Deployment | null>(null)

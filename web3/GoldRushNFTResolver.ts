@@ -3,13 +3,6 @@ import type { OnChainItem, NFTDataResolver, NFTItem } from "~/types/NFTDataResol
 import { PinataResolver } from "./PinataResolver"
 import { useResolveTokenUrisFromChain } from "~/composables/tokenUris"
 
-// export class GoldRushOnChainItem implements OnChainItem {
-//   constructor(private raw) {
-//   }
-//   get token_uri() {return this.raw.contractAddress}
-//   get token_id() {return this.raw.}
-// }
-
 export class GoldRushNFTResolver implements NFTDataResolver {
   apiKey: string
   chain: string
@@ -25,7 +18,7 @@ export class GoldRushNFTResolver implements NFTDataResolver {
     const options = {
       method: "GET",
       headers: {
-        Authentication: `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
       },
     }
 
@@ -41,7 +34,7 @@ export class GoldRushNFTResolver implements NFTDataResolver {
     // https://docs.moralis.com/web3-data-api/evm/reference/get-wallet-nfts
     const { items } = (await rawRes.json()) as { items: { contract_address: Hex; nft_data: OnChainItem[] }[] }
 
-    const displayItems = await this.pinataResolver.resolveDisplayInfo(
+    const displayItems = await this.pinataResolver.resolveItemsDisplayInfo(
       items.filter((collection) => collections.includes(collection.contract_address)).flatMap((item) => item.nft_data)
     )
 
@@ -52,7 +45,7 @@ export class GoldRushNFTResolver implements NFTDataResolver {
     // GoldRush doesn't provide a function for fetching uri by id so we've to fetch it from the blockchain.
     const tokenUris = await useResolveTokenUrisFromChain(items, this.chain)
 
-    const displayItems = await this.pinataResolver.resolveDisplayInfo(
+    const displayItems = await this.pinataResolver.resolveItemsDisplayInfo(
       items.map((item, i) => ({ token_id: BigInt(item.tokenId), token_uri: tokenUris[i] }))
     )
 

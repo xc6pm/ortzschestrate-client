@@ -1,5 +1,5 @@
 import { useAccount } from "@wagmi/vue"
-import { readContract, writeContract, waitForTransactionReceipt } from "@wagmi/core"
+import { readContract, writeContract, waitForTransactionReceipt } from "@wagmi/vue/actions"
 import type { Abi, Hex } from "viem"
 
 /**
