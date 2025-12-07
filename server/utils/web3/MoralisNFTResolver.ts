@@ -1,6 +1,7 @@
 import type { Hex } from "viem"
-import type { OnChainItem, NFTDataResolver, NFTItem } from "~/types/NFTDataResolver"
 import { PinataResolver } from "./PinataResolver"
+import { NFTDataResolver } from "./NFTDataResolver"
+import { NFTItem, OnChainItem } from "~/types/NFTItem"
 
 export class MoralisNFTResolver implements NFTDataResolver {
   apiKey: string
@@ -52,30 +53,21 @@ export class MoralisNFTResolver implements NFTDataResolver {
       headers: {
         accept: "application/json",
         "Content-Type": "application/json",
-        "x-api-key": this.apiKey,
+        "X-API-Key": this.apiKey,
       },
       body: JSON.stringify({
         tokens: items.map(({ tokenId, contractAddress }) => ({
           token_address: contractAddress,
           token_id: tokenId,
         })),
-      }),
-    }
-    console.log(
-      "fetching....",
-      options.body,
-      JSON.stringify({
-        tokens: items.map(({ tokenId, contractAddress }) => ({
-          token_address: contractAddress,
-          token_id: tokenId,
-        })),
         normalizeMetadata: false,
         media_items: false,
-      })
-    )
+      }),
+    }
+    console.log("fetching....")
 
     const rawRes = await fetch(
-      `https://deep-index.moralis.io/api/v2.2/nft/getMultipleNFTs?chain=polygon%20amoy`,
+      `https://deep-index.moralis.io/api/v2.2/nft/getMultipleNFTs?chain=${this.chain}`,
       options
     )
 

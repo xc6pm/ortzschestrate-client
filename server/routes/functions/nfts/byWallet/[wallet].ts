@@ -1,7 +1,6 @@
 import { readFile } from "fs/promises"
 import { Hex } from "viem"
 import { Deployment } from "~/types/Deployment"
-import { AnkrNFTResolver } from "~/web3/AnkrNFTResolver"
 
 export default defineEventHandler(async (event) => {
   const wallet = event.context.params?.["wallet"] as Hex

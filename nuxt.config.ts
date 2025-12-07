@@ -1,6 +1,8 @@
+import { fileURLToPath } from "url"
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2024-04-03",
+  compatibilityDate: "2024-11-01",
   devtools: { enabled: true },
 
   devServer: {
@@ -12,17 +14,13 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    "/": { swr: true },
-    "/**": { swr: true },
+    "/": { isr: true },
+    "/**": { isr: true },
     "/auth/**": { ssr: false },
     "/game/**": { ssr: false },
-    "/history/**": { swr: true },
-    "/shop/**": { swr: true },
+    "/history/**": { isr: true },
+    "/shop/**": { isr: true },
     "/shop/owned": { ssr: false },
-    "/functions/ipfs/**": { swr: true, cache: false },
-    "/functions/nfts/**": { swr: true, cache: false },
-    "/functions/nfts/byWallet/**": { swr: true, cache: false },
-    "/deployment/**": { swr: true },
   },
 
   runtimeConfig: {

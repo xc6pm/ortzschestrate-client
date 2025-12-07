@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAccount } from "@wagmi/vue"
-import type { NFTItem } from "~/types/NFTDataResolver"
+import type { NFTItem } from "~/types/NFTItem"
 
 definePageMeta({ ssr: false })
 

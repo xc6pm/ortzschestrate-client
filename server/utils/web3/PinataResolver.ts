@@ -1,4 +1,4 @@
-import type { OnChainItem, NFTItem, IPFSItem } from "~/types/NFTDataResolver"
+import type { OnChainItem, NFTItem, IPFSItem } from "~/types/NFTItem"
 
 export class PinataResolver {
   readonly ipfsGateway: string

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAccount } from "@wagmi/vue"
 import { isAddressEqual, zeroAddress } from "viem"
-import type { SaleItem } from "~/types/NFTDataResolver"
+import type { SaleItem } from "~/types/NFTItem"
 
 const nftStore = useNFTStore()
 const account = process.client ? useAccount() : { status: ref("disconnected"), address: ref(null) }

@@ -1,6 +1,7 @@
 import type { Hex } from "viem"
-import type { NFTDataResolver, NFTItem } from "~/types/NFTDataResolver"
+import type { NFTItem } from "~/types/NFTItem"
 import { PinataResolver } from "./PinataResolver"
+import { NFTDataResolver } from "./NFTDataResolver"
 
 export class AnkrNFTResolver implements NFTDataResolver {
   apiKey: string
@@ -19,6 +20,7 @@ export class AnkrNFTResolver implements NFTDataResolver {
     }
 
     const url = `https://rpc.ankr.com/multichain/${this.apiKey}`
+    console.log("Fetching NFTs from Ankr for wallet", walletAddress, "on chain", this.chain)
     const options = {
       method: "POST",
       headers: {
@@ -45,6 +47,8 @@ export class AnkrNFTResolver implements NFTDataResolver {
       result: { assets: { tokenId: string; tokenUrl: "https://ipfs.io/ipfs/${cid}"; contractAddress: Hex }[] }
     }
 
+    console.log("Ankr returned", result.assets.length, "NFTs for wallet", walletAddress)
+
     const cidStart = "https://ipfs.io/ipfs/${cid}".lastIndexOf("/") + 1
     const displayItems = await this.pinataResolver.resolveItemsDisplayInfo(
       collections && collections.length
@@ -65,12 +69,6 @@ export class AnkrNFTResolver implements NFTDataResolver {
 
   async getNFTsById(items: { tokenId: string; contractAddress: string }[]): Promise<NFTItem[]> {
     // Ankr doesn't provide a function for batch fetching items by id so for now, we just read them from the chain.
-    const tokenUris = await useResolveTokenUrisFromChain(items, this.chain)
-
-    const displayItems = await this.pinataResolver.resolveItemsDisplayInfo(
-      items.map((item, i) => ({ token_id: BigInt(item.tokenId), token_uri: tokenUris[i] }))
-    )
-
-    return displayItems
+    throw new Error("AnkrNFTResolver.getNFTsById not implemented yet")
   }
 }

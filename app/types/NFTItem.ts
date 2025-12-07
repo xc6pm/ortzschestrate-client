@@ -26,7 +26,3 @@ export type SaleItem = NFTItem & {
   seller: Hex
 }
 
-export interface NFTDataResolver {
-  getNFTsByWallet(walletAddress: Hex, collections?: Hex[]): Promise<NFTItem[]>
-  getNFTsById(items: { tokenId: string; contractAddress: string }[]): Promise<NFTItem[]>
-}

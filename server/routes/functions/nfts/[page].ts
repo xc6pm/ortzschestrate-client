@@ -2,9 +2,8 @@ import { readFile } from "node:fs/promises"
 import { createPublicClient, formatEther, Hex, http } from "viem"
 import { Deployment } from "~/types/Deployment"
 import { Listing } from "~/types/Listing"
-import { PinataResolver } from "~/web3/PinataResolver"
 import { gql, request } from "graphql-request"
-import type { SaleItem, NFTItem } from "~/types/NFTDataResolver"
+import type { SaleItem, NFTItem } from "~/types/NFTItem"
 import { polygonAmoy } from "viem/chains"
 
 export default defineEventHandler(async (event): Promise<SaleItem[]> => {

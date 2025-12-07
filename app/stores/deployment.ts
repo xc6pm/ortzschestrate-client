@@ -31,9 +31,9 @@ export const useDeploymentStore = defineStore("deploymentStore", () => {
         ])
       }
 
-      bettingDepl.value = Object.freeze(depls[0])
-      nietzschessNFTDepl.value = Object.freeze(depls[1])
-      marketplaceDepl.value = Object.freeze(depls[2])
+      bettingDepl.value = Object.freeze(depls[0]!)
+      nietzschessNFTDepl.value = Object.freeze(depls[1]!)
+      marketplaceDepl.value = Object.freeze(depls[2]!)
     } catch (err) {
       console.warn("Failed to load deployments.", err)
       bettingDepl.value = nietzschessNFTDepl.value = marketplaceDepl.value = null

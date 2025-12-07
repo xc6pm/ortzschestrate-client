@@ -1,7 +1,8 @@
 import type { Hex } from "viem"
-import type { OnChainItem, NFTDataResolver, NFTItem } from "~/types/NFTDataResolver"
+import type { OnChainItem, NFTItem } from "~/types/NFTItem"
 import { PinataResolver } from "./PinataResolver"
 import { useResolveTokenUrisFromChain } from "~/composables/tokenUris"
+import { NFTDataResolver } from "./NFTDataResolver"
 
 export class GoldRushNFTResolver implements NFTDataResolver {
   apiKey: string
