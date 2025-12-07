@@ -1,10 +1,11 @@
 import { useAccount } from "@wagmi/vue"
-import { getBlockNumber, readContract, watchContractEvent, type WatchContractEventReturnType } from "@wagmi/core"
+import { getBlockNumber, readContract, watchContractEvent } from "@wagmi/vue/actions"
 import type { Deployment } from "~/types/Deployment"
-import { config } from "~/web3/wagmiConfig"
 import { formatEther, type Abi, type Log } from "viem"
 
-const deploymentArtifact = import.meta.dev ? "/deployment/dev/ORTBet.json" : "/deployment/ORTBet.json"
+type WatchContractEventReturnType = () => void
+
+const deploymentArtifact = "/deployment/ORTBet.json"
 
 export const useContractStateStore = defineStore("contractStateStore", () => {
   const deployment = ref<Deployment | null>(null)
@@ -12,6 +13,7 @@ export const useContractStateStore = defineStore("contractStateStore", () => {
   const stakesWei = ref(0n)
   const stakesEth = ref(0)
   let unwatchBalanceTrackingEvents: WatchContractEventReturnType[] = []
+  const { config } = useWagmi()
 
   watch(deployment, async (newValue, oldValue) => {
     if (newValue?.address) {

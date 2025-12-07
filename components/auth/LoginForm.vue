@@ -4,10 +4,11 @@ import type { FormSubmitEvent } from "#ui/types"
 const config = useRuntimeConfig()
 
 const loginUrl = apiUrl("/auth/login")
-const googleLoginUrl =
-  config.public.apiUrl +
-  "/auth/google?" +
-  new URLSearchParams({ redirect: window.location.protocol + "//" + window.location.host })
+const googleLoginUrl = process.client
+  ? config.public.apiUrl +
+    "/auth/google?" +
+    new URLSearchParams({ redirect: window.location.protocol + "//" + window.location.host })
+  : ""
 
 const state = reactive({
   emailOrUsername: "",
@@ -79,5 +80,3 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
     >
   </UForm>
 </template>
-
-<style scoped></style>

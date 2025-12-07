@@ -6,6 +6,9 @@ import { NuxtLayout } from "#components"
   <UApp>
     <NuxtLayout>
       <NuxtPage />
+      <ClientOnly>
+        <IndexOfflineBanner />
+      </ClientOnly>
     </NuxtLayout>
   </UApp>
 </template>
