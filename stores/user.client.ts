@@ -1,9 +1,19 @@
-export type User = { id: string; userName: string; email: string; verifiedWallet: string }
+import { useAccount } from "@wagmi/vue"
+import { isAddressEqual, zeroAddress, type Hex } from "viem"
+
+export type User = { id: string; userName: string; email: string; verifiedWallet: Hex }
 
 export const useUserStore = defineStore("userStore", () => {
   const user = ref<User | null>(null)
   const initialized = ref(false)
   const toast = useToast()
+  const account = useAccount()
+  const isWalletVerified = computed(() => {
+    return (
+      account.status.value === "connected" &&
+      isAddressEqual(account.address.value ?? zeroAddress, user.value?.verifiedWallet ?? zeroAddress)
+    )
+  })
 
   const fetch = async () => {
     try {
@@ -28,5 +38,5 @@ export const useUserStore = defineStore("userStore", () => {
     }
   }
 
-  return { user, fetch, initialized }
+  return { user, fetch, initialized, isWalletVerified }
 })

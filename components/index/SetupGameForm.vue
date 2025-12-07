@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormError } from "@nuxt/ui"
-import { useContractStateStore } from "~/stores/contractState"
+import { useContractStateStore } from "~/stores/contractState.client"
 
 const gameTimes = [
   { label: "Rapid", value: 600000 },

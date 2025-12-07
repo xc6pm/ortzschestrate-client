@@ -8,22 +8,32 @@ export const useDeploymentStore = defineStore("deploymentStore", () => {
   const { isOnline } = useNetworkStatus()
 
   const urls = {
-    betting: "/deployment/ORTBet.json",
-    nft: "/deployment/NietzschessNFT.json",
-    market: "/deployment/NietzschessNFTMarketplace.json",
+    betting: "deployment/ORTBet.json",
+    nft: "deployment/NietzschessNFT.json",
+    market: "deployment/NietzschessNFTMarketplace.json",
   }
 
   const load = async () => {
     try {
-      const [b, n, m] = await Promise.all([
-        $fetch<Deployment>(urls.betting),
-        $fetch<Deployment>(urls.nft),
-        $fetch<Deployment>(urls.market),
-      ])
+      let depls: Deployment[]
+      if (import.meta.server) {
+        const { readFile } = await import("node:fs/promises")
+        depls = [
+          JSON.parse(await readFile(`public/${urls.betting}`, "utf-8")),
+          JSON.parse(await readFile(`public/${urls.nft}`, "utf-8")),
+          JSON.parse(await readFile(`public/${urls.market}`, "utf-8")),
+        ]
+      } else {
+        depls = await Promise.all([
+          $fetch<Deployment>(urls.betting),
+          $fetch<Deployment>(urls.nft),
+          $fetch<Deployment>(urls.market),
+        ])
+      }
 
-      bettingDepl.value = Object.freeze(b)
-      nietzschessNFTDepl.value = Object.freeze(n)
-      marketplaceDepl.value = Object.freeze(m)
+      bettingDepl.value = Object.freeze(depls[0])
+      nietzschessNFTDepl.value = Object.freeze(depls[1])
+      marketplaceDepl.value = Object.freeze(depls[2])
     } catch (err) {
       console.warn("Failed to load deployments.", err)
       bettingDepl.value = nietzschessNFTDepl.value = marketplaceDepl.value = null

@@ -2,24 +2,29 @@
 import { useAccount } from "@wagmi/vue"
 import type { NFTItem } from "~/types/NFTDataResolver"
 
+definePageMeta({ ssr: false })
+
 const nftStore = useNFTStore()
 const account = useAccount()
+const userStore = useUserStore()
+const ownedItems = ref<NFTItem[] | null>(null)
 
 const fetchOwnedItems = async () => {
-  ownedItems.value = await $fetch<NFTItem[]>(`/functions/nfts/byWallet/${account.address.value}`)
-}
-const ownedItems = ref<NFTItem[] | null>(null)
-if (account.address) {
-  await fetchOwnedItems()
-}
-watch(account.address, async (accountAddress) => {
-  if (accountAddress) {
-    console.log("making api call")
-    await fetchOwnedItems()
-    console.log("api call made", ownedItems.value)
+  if (!userStore.isWalletVerified) {
+    ownedItems.value = null
+    return
+  }
+
+  if (account.address.value) {
+    ownedItems.value = await $fetch<NFTItem[]>(`/functions/nfts/byWallet/${account.address.value}`)
   } else {
     ownedItems.value = null
   }
+}
+
+await fetchOwnedItems()
+watch(account.address, async () => {
+  await fetchOwnedItems()
 })
 </script>
 

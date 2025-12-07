@@ -14,20 +14,25 @@ export class AnkrNFTResolver implements NFTDataResolver {
   }
 
   async getNFTsByWallet(walletAddress: Hex, collections?: Hex[]): Promise<NFTItem[]> {
+    if (collections?.length) {
+      collections = collections.map((c) => c.toLowerCase() as Hex)
+    }
+
     const url = `https://rpc.ankr.com/multichain/${this.apiKey}`
     const options = {
       method: "POST",
       headers: {
         accept: "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         id: 1,
         jsonrpc: "2.0",
         method: "ankr_getNFTsByOwner",
         params: {
-          blockchain: "polygon_amoy",
+          blockchain: this.chain,
           pageSize: 20,
-          walletAddress: "0xB1A5A3B36213889C29738bbe1f83b3983FfE46e5",
+          walletAddress: walletAddress,
         },
       }),
     }
@@ -37,15 +42,22 @@ export class AnkrNFTResolver implements NFTDataResolver {
     if (!response.ok) throw new Error(response.status + ":" + response.statusText)
 
     const { result } = (await response.json()) as {
-      result: { assets: { tokenId: string; tokenUrl: "https://ipfs.io/ipfs/${cid}" }[] }
+      result: { assets: { tokenId: string; tokenUrl: "https://ipfs.io/ipfs/${cid}"; contractAddress: Hex }[] }
     }
 
     const cidStart = "https://ipfs.io/ipfs/${cid}".lastIndexOf("/") + 1
     const displayItems = await this.pinataResolver.resolveItemsDisplayInfo(
-      result.assets.map((item) => ({
-        token_uri: `ipfs://${item.tokenUrl.substring(cidStart)}`,
-        token_id: BigInt(item.tokenId),
-      }))
+      collections && collections.length
+        ? result.assets
+            .filter((item) => collections.includes(item.contractAddress.toLowerCase() as Hex))
+            .map((item) => ({
+              token_uri: `ipfs://${item.tokenUrl.substring(cidStart)}`,
+              token_id: BigInt(item.tokenId),
+            }))
+        : result.assets.map((item) => ({
+            token_uri: `ipfs://${item.tokenUrl.substring(cidStart)}`,
+            token_id: BigInt(item.tokenId),
+          }))
     )
 
     return displayItems

@@ -1,12 +1,9 @@
 <script setup lang="ts">
-console.log("offlinebanner loading")
 const { isOnline } = useNetworkStatus()
-console.log(isOnline.value)
 
 const bannerText = ref<"You're offline." | "Back online." | "">(isOnline ? "" : "You're offline.")
 
 watch(isOnline, (online) => {
-  console.log("watch is running")
   if (!online) {
     bannerText.value = "You're offline."
   } else {

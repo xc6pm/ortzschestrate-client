@@ -15,9 +15,11 @@ const userStore = useUserStore()
           Shop
         </NuxtLink>
 
-        <WalletButton v-if="userStore.user" />
+        <ClientOnly>
+          <WalletButton v-if="userStore.user" />
 
-        <UserButton />
+          <UserButton />
+        </ClientOnly>
       </div>
     </UContainer>
   </header>

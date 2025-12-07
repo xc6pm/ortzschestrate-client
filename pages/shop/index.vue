@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useAccount } from "@wagmi/vue"
+import { isAddressEqual, zeroAddress } from "viem"
 import type { SaleItem } from "~/types/NFTDataResolver"
 
 const nftStore = useNFTStore()
@@ -10,10 +11,10 @@ const { data: listings } = await useFetch<SaleItem[]>("/functions/nfts/1")
 </script>
 
 <template>
-  <div v-if="account.status.value === 'connected'" class="flex justify-between items-end my-4">
+  <div class="flex justify-between items-end my-4">
     <h3 class="mt-0">Listings</h3>
 
-    <div>
+    <div v-if="userStore.isWalletVerified">
       <UButton v-if="userStore.user" label="Owned Items" variant="outline" to="/shop/owned" />
 
       <UButton
@@ -35,9 +36,11 @@ const { data: listings } = await useFetch<SaleItem[]>("/functions/nfts/1")
         :title="item.metadata.name"
         :price="item.priceEth"
         :image="item.metadata.image"
-        :is-owned="item.seller.toLowerCase() === account.address.value?.toLowerCase()"
+        :is-owned="isAddressEqual(item.seller, account.address.value ?? zeroAddress)"
         :can-buy="
-          account.status.value === 'connected' && item.seller.toLowerCase() !== account.address.value?.toLowerCase()
+          account.status.value === 'connected' &&
+          userStore.isWalletVerified &&
+          !isAddressEqual(item.seller, account.address.value ?? zeroAddress)
         "
         :listed="true"
       />

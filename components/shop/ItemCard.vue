@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "@wagmi/vue"
-import { formatEther, parseEther, type Abi, type Hex } from "viem"
+import { parseEther, type Abi, type Hex } from "viem"
 
 interface Props {
   tokenId: bigint
@@ -13,15 +13,25 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-console.log("props.price", props.price)
 
 const emit = defineEmits(["newTx"])
 
 const idFormatted = computed(() => `#${props.tokenId.toString().padStart(3, "0")}`)
 
 const handleBuy = () => {
-  // TODO: Implement NFT purchase logic
-  console.log(`Buying ${props.title} for ${props.price} POL`)
+  if (!props.canBuy || !props.price || !marketplaceDepl.value || !nietzschessNFTDepl.value) return
+
+  writeContract({
+    abi: marketplaceDepl.value.abi as Abi,
+    address: marketplaceDepl.value.address as Hex,
+    account: account.address.value,
+    chainId: chains[0].id,
+    functionName: "purchaseItem",
+    args: [nietzschessNFTDepl.value.address, props.tokenId],
+    value: parseEther(props.price),
+  })
+
+  emit("newTx", tx)
 }
 
 const account = useAccount()
@@ -108,8 +118,9 @@ const cancelSell = () => {
           <span class="text-2xl font-bold text-green-400">{{ price }}</span>
           <span class="text-sm text-gray-500">POL</span>
         </div>
-
-        <UButton @click="handleBuy" color="primary" :disabled="!canBuy"> Buy Now </UButton>
+        <ClientOnly>
+          <UButton @click="handleBuy" color="primary" :disabled="!canBuy"> Buy Now </UButton>
+        </ClientOnly>
       </div>
 
       <div v-if="showPriceInput" class="w-full flex mt-2">

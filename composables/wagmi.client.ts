@@ -1,5 +1,6 @@
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi"
 import type { AppKitNetwork } from "@reown/appkit/networks"
+import { AppKit, createAppKit, type ThemeMode } from "@reown/appkit/vue"
 import { createConfig, injected } from "@wagmi/vue"
 import { metaMask, safe, walletConnect } from "@wagmi/vue/connectors"
 import { http } from "viem"
@@ -11,6 +12,7 @@ type WagmiProps = {
   config: ReturnType<typeof createConfig>
   networks: AppKitNetwork[]
   chains: Chain[]
+  modal: AppKit
 }
 
 let wagmiProps: WagmiProps | null = null
@@ -33,7 +35,39 @@ const initWagmi = (projectId: string): WagmiProps => {
     projectId,
   })
 
-  return { wagmiAdapter, projectId, config, networks, chains }
+  const requestUrl = useRequestURL()
+  console.log("origin", requestUrl.origin)
+
+  const metadata = {
+    name: "AppKit",
+    description: "AppKit Example",
+    url: requestUrl.origin, // origin must match your domain & subdomain
+    icons: ["https://avatars.githubusercontent.com/u/179229932"],
+  }
+
+  const colorMode = useColorMode()
+
+  const modal = createAppKit({
+    adapters: [wagmiAdapter],
+    networks: [networks[0], ...networks],
+    projectId,
+    metadata,
+    features: {
+      analytics: true, // Optional - defaults to your Cloud configuration
+      send: false,
+      swaps: false,
+      receive: false,
+      onramp: false,
+    },
+    themeMode: colorMode.value as ThemeMode,
+
+    themeVariables: {
+      "--w3m-accent": "#435063",
+      "--w3m-border-radius-master": ".85px",
+    },
+  })
+
+  return { wagmiAdapter, projectId, config, networks, chains, modal }
 }
 
 export const useWagmi = () => {

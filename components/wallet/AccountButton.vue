@@ -2,7 +2,7 @@
 import type { FormError } from "@nuxt/ui"
 import { useAccount, useWriteContract } from "@wagmi/vue"
 import { parseEther, type Hex } from "viem"
-import { useContractStateStore } from "~/stores/contractState"
+import { useContractStateStore } from "~/stores/contractState.client"
 
 const account = useAccount()
 if (!account.isConnected.value) throw new Error("The account must be connected for this component.")
@@ -90,7 +90,7 @@ const dropdownItems = ref([
     {
       label: "disconnect",
       onSelect: () => {
-        wagmiAdapter.disconnect({id: account.address.value})
+        wagmiAdapter.disconnect({ id: account.address.value })
       },
     },
   ],

@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { swr: true },
     "/**": { swr: true },
-    "/auth/**": { swr: true },
+    "/auth/**": { ssr: false },
     "/game/**": { ssr: false },
     "/history/**": { swr: true },
     "/shop/**": { swr: true },
@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     "/functions/ipfs/**": { swr: true, cache: false },
     "/functions/nfts/**": { swr: true, cache: false },
     "/functions/nfts/byWallet/**": { swr: true, cache: false },
+    "/deployment/**": { swr: true },
   },
 
   runtimeConfig: {
@@ -37,6 +38,7 @@ export default defineNuxtConfig({
     moralisApiKey: process.env.MORALIS_API_KEY,
     theGraphStudioApiKey: process.env.THE_GRAPH_STUDIO_API_KEY,
     goldRushApiKey: process.env.GOLDRUSH_API_KEY,
+    ankrApiKey: process.env.ANKR_API_KEY,
   },
 
   vite: {
