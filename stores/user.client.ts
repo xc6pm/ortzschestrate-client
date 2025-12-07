@@ -8,11 +8,14 @@ export const useUserStore = defineStore("userStore", () => {
   const initialized = ref(false)
   const toast = useToast()
   const account = useAccount()
-  const isWalletVerified = computed(() => {
-    return (
-      account.status.value === "connected" &&
-      isAddressEqual(account.address.value ?? zeroAddress, user.value?.verifiedWallet ?? zeroAddress)
-    )
+  const isWalletVerified = ref(false)
+
+  watchEffect(() => {
+    const status = account.status.value
+    const address = account.address.value
+    const wallet = user.value?.verifiedWallet
+
+    isWalletVerified.value = status === "connected" && !!address && !!wallet && isAddressEqual(address, wallet as Hex)
   })
 
   const fetch = async () => {

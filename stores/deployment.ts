@@ -8,9 +8,9 @@ export const useDeploymentStore = defineStore("deploymentStore", () => {
   const { isOnline } = useNetworkStatus()
 
   const urls = {
-    betting: "deployment/ORTBet.json",
-    nft: "deployment/NietzschessNFT.json",
-    market: "deployment/NietzschessNFTMarketplace.json",
+    betting: "/deployment/ORTBet.json",
+    nft: "/deployment/NietzschessNFT.json",
+    market: "/deployment/NietzschessNFTMarketplace.json",
   }
 
   const load = async () => {

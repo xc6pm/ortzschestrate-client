@@ -23,7 +23,7 @@ const fetchOwnedItems = async () => {
 }
 
 await fetchOwnedItems()
-watch(account.address, async () => {
+watch([() => account.address.value, () => userStore.isWalletVerified], async () => {
   await fetchOwnedItems()
 })
 </script>

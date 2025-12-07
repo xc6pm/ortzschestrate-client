@@ -5,7 +5,7 @@ import { formatEther, type Abi, type Log } from "viem"
 
 type WatchContractEventReturnType = () => void
 
-const deploymentArtifact = import.meta.server ? "public/deployment/ORTBet.json" : "/deployment/ORTBet.json"
+const deploymentArtifact = "/deployment/ORTBet.json"
 
 export const useContractStateStore = defineStore("contractStateStore", () => {
   const deployment = ref<Deployment | null>(null)
