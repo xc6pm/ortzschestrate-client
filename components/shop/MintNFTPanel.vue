@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "@wagmi/vue"
+import { useAccount } from "@wagmi/vue"
 import type { Abi } from "viem"
 
 interface Attribute {
@@ -33,7 +33,12 @@ const loading = ref(false)
 const nftStore = useNFTStore()
 const toast = useToast()
 const account = useAccount()
-const { data: writeContractTx, error: writeContractErr, writeContract } = useWriteContract()
+const {
+  data: writeContractTx,
+  error: writeContractErr,
+  writeContract,
+  isConfirmed
+} = useWriteContractWithTracking(computed(() => `Mint ${nftData.name || "NFT"}`))
 const { chains } = useWagmi()
 
 const handleMint = async () => {
@@ -107,8 +112,6 @@ const uploadToPinata = async () => {
 
   return uploadRes
 }
-
-const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: writeContractTx })
 
 watchEffect(() => {
   if (isConfirmed.value) {
@@ -194,12 +197,5 @@ const resetForm = () => {
         <UButton type="submit" block size="lg" class="mt-6" :loading="loading"> Mint NFT </UButton>
       </UForm>
     </UCard>
-
-    <ShopTxStatusCard
-      :is-confirming="isConfirming"
-      :is-confirmed="isConfirmed"
-      :tx-id="writeContractTx"
-      :tx-err="writeContractErr"
-    />
   </main>
 </template>

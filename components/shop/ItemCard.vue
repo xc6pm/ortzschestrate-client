@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "@wagmi/vue"
+import { useAccount } from "@wagmi/vue"
 import { parseEther, type Abi, type Hex } from "viem"
 
 interface Props {
@@ -18,9 +18,18 @@ const emit = defineEmits(["newTx"])
 
 const idFormatted = computed(() => `#${props.tokenId.toString().padStart(3, "0")}`)
 
+const lastAction = ref<"buy" | "sell" | null>(null)
+
+const { writeContract, isPending, tx } = useWriteContractWithTracking(
+  computed(() => {
+    return lastAction.value === "buy" ? `Purchase ${props.title}` : `List ${props.title} for sale`
+  })
+)
+
 const handleBuy = () => {
   if (!props.canBuy || !props.price || !marketplaceDepl.value || !nietzschessNFTDepl.value) return
 
+  lastAction.value = "buy"
   writeContract({
     abi: marketplaceDepl.value.abi as Abi,
     address: marketplaceDepl.value.address as Hex,
@@ -42,15 +51,6 @@ const minPrice = 0.01
 const { marketplaceDepl, nietzschessNFTDepl } = storeToRefs(useDeploymentStore())
 const { chains } = useWagmi()
 const { ensureApproved } = useEnsureItemApprovedForSale()
-const { writeContract, data, error, isPending } = useWriteContract()
-const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: data })
-const tx = computed(() => ({
-  isConfirming: isConfirming.value,
-  isConfirmed: isConfirmed.value,
-  txId: data.value,
-  txErr: error.value,
-}))
-
 const handleSell = async () => {
   if (!props.isOwned || !marketplaceDepl.value) return
 
@@ -69,6 +69,7 @@ const handleSell = async () => {
     return
   }
 
+  lastAction.value = "sell"
   writeContract({
     abi: marketplaceDepl.value.abi as Abi,
     address: marketplaceDepl.value.address as Hex,
