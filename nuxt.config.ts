@@ -43,6 +43,11 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: ["eventemitter3"],
     },
+    resolve: {
+      alias: {
+        "vue-demi": "vue-demi/lib/v3/index.mjs",
+      },
+    },
   },
 
   vue: {
