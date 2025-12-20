@@ -1,4 +1,3 @@
-import { readFile } from "node:fs/promises"
 import { createPublicClient, formatEther, Hex, http } from "viem"
 import { Deployment } from "~/types/Deployment"
 import { Listing } from "~/types/Listing"
@@ -15,8 +14,15 @@ export default defineEventHandler(async (event): Promise<SaleItem[]> => {
   }))
 
   const runtimeConfig = useRuntimeConfig()
-  const deplRaw = await readFile("public/deployment/NietzschessNFT.json", "utf-8")
-  const deplJson: Deployment = JSON.parse(deplRaw)
+  const deplJson = await useStorage("assets:deployment").getItem<Deployment>("NietzschessNFT.json")
+
+  if (!deplJson) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Deployment file not found",
+    })
+  }
+
   const pinataResolver = new PinataResolver(runtimeConfig.public.ipfsGateway)
 
   const publicClient = createPublicClient({ chain: polygonAmoy, transport: http() })

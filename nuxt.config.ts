@@ -1,5 +1,3 @@
-import { fileURLToPath } from "url"
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
@@ -63,5 +61,14 @@ export default defineNuxtConfig({
     theme: {
       colors: ["primary", "secondary", "tertiary", "info", "success", "warning", "error", "neutral"],
     },
+  },
+
+  nitro: {
+    serverAssets: [
+      {
+        baseName: "deployment",
+        dir: "public/deployment",
+      },
+    ],
   },
 })
