@@ -7,7 +7,7 @@ const blurBackgroundOnScroll = () => {
   isBlurred.value = window.scrollY > 1
 }
 
-const bgId = Math.floor(Math.random() * 4)
+const bgId = Math.floor(Math.random() * 3)
 const backgroundImagePath = `/img/home-bg/${bgId}.png`
 
 onMounted(() => {

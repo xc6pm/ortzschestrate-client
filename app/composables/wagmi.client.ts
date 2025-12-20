@@ -39,9 +39,9 @@ const initWagmi = (projectId: string): WagmiProps => {
   console.log("origin", requestUrl.origin)
 
   const metadata = {
-    name: "AppKit",
-    description: "AppKit Example",
-    url: requestUrl.origin, // origin must match your domain & subdomain
+    name: "Nietzschess",
+    description: "Nietzschess Web3 Chess Platform",
+    url: import.meta.client ? window.location.origin : requestUrl.origin,
     icons: ["https://avatars.githubusercontent.com/u/179229932"],
   }
 
