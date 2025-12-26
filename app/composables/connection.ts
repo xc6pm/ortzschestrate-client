@@ -11,7 +11,7 @@ export const useAcknowledgeableEvent = (eventName: string, handler: (...args: an
 
   const ackHandler = (wrapper: AckMessage) => {
     console.log("ack message received")
-    connectionStore.invoke("ack", wrapper.messageId)
+    connectionStore.invoke("ack", (wrapper.messageId, Date.now()))
     handler(wrapper.message)
   }
 
