@@ -36,6 +36,7 @@ export type GameResult = {
 
 export type GameUpdate = {
   san: string
+  color: string
   remainingTimeInMilliseconds: number
 }
 
