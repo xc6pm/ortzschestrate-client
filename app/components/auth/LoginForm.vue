@@ -4,7 +4,7 @@ import type { FormSubmitEvent } from "#ui/types"
 const config = useRuntimeConfig()
 
 const loginUrl = apiUrl("/auth/login")
-const googleLoginUrl = process.client
+const googleLoginUrl = import.meta.client
   ? config.public.apiUrl +
     "/auth/google?" +
     new URLSearchParams({ redirect: window.location.protocol + "//" + window.location.host })
@@ -20,13 +20,11 @@ const tryingLogin = ref(false)
 const userStore = useUserStore()
 
 const tryLogin = async (event: FormSubmitEvent<any>) => {
-  event.preventDefault()
-
   tryingLogin.value = true
   const enteredValueIsEmail = isValidEmail(state.emailOrUsername)
 
   try {
-    const res = await $fetch.raw(loginUrl, {
+    const res = await $fetch.raw<{ detail?: string }>(loginUrl, {
       method: "POST",
       body: JSON.stringify({
         password: state.password,
@@ -65,7 +63,7 @@ const tryLogin = async (event: FormSubmitEvent<any>) => {
 </script>
 
 <template>
-  <UForm @submit="tryLogin" class="px-5 pt-3 py-5" :state="state">
+  <UForm @submit.prevent="tryLogin" class="px-5 pt-3 py-5" :state="state">
     <UFormField label="Email or username:" name="emailOrUsername" class="mb-3">
       <UInput v-model="state.emailOrUsername" type="text" required autofocus :disabled="tryingLogin" />
     </UFormField>

@@ -26,7 +26,7 @@ const tryRegister = async (event: FormSubmitEvent<any>) => {
 
   tryingRegister.value = true
   try {
-    const res = await $fetch.raw(registerUrl, {
+    const res = await $fetch.raw<{ detail?: string }>(registerUrl, {
       method: "POST",
       body: JSON.stringify({
         email: state.email,
@@ -60,7 +60,7 @@ const tryRegister = async (event: FormSubmitEvent<any>) => {
 </script>
 
 <template>
-  <UForm @submit="tryRegister" :state="state" class="px-5 pt-3 pb-5">
+  <UForm @submit.prevent="tryRegister" :state="state" class="px-5 pt-3 pb-5">
     <UFormField label="Email:" name="email" class="mb-3">
       <UInput type="email" autofocus v-model="state.email" required :disabled="tryingRegister" />
     </UFormField>
