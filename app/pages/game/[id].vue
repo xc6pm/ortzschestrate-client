@@ -62,7 +62,7 @@ const playerTimer = useTemplateRef("playerTimer")
 useAcknowledgeableEvent("PlayerMoved", (gameUpdate: GameUpdate) => {
   console.log("new move", gameUpdate)
 
-  if (boardApi?.getLastMove()?.san === gameUpdate.san) {
+  if (gameUpdate.color === game.color) {
     playerTimer.value?.syncWithServer(gameUpdate.remainingTimeInMilliseconds)
     isPlayersTurn.value = false
     updatePlayerCapturedPieces()
