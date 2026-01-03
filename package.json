@@ -34,6 +34,7 @@
     "@iconify-json/mdi": "^1.2.3",
     "@vue/devtools-api": "6.6.3",
     "@vueuse/nuxt": "13.1.0",
+    "baseline-browser-mapping": "^2.9.11",
     "tailwindcss": "^4.1.16",
     "typescript": "^5.8.2",
     "vercel": "^41.4.1"
