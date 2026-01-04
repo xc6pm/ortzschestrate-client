@@ -97,16 +97,16 @@ const dropdownItems = ref([
 ])
 
 const invalidateVerifyButton = () => {
-  if (!walletVerified.value) {
+  if (!walletVerified.value && dropdownItems.value[0]![0]!.label !== "verify") {
     dropdownItems.value[0] = [
       {
         label: "verify",
         onSelect: () => verifyWallet(),
       },
-      ...dropdownItems.value[0],
+      ...dropdownItems.value[0]!,
     ]
-  } else if (dropdownItems.value[0].find((item) => item?.label === "verify")) {
-    dropdownItems.value[0].splice(0, 1)
+  } else if (dropdownItems.value[0]!.find((item) => item?.label === "verify")) {
+    dropdownItems.value[0]!.splice(0, 1)
   }
 }
 
