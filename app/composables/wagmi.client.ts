@@ -50,6 +50,7 @@ const initWagmi = (projectId: string): WagmiProps => {
   const modal = createAppKit({
     adapters: [wagmiAdapter],
     networks: [networks[0], ...networks],
+    enableReconnect: false,
     projectId,
     metadata,
     features: {
