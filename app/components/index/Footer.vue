@@ -2,12 +2,14 @@
 defineProps<{
   imgLoaded?: boolean
 }>()
+
+const currentYear = new Date().getFullYear()
 </script>
 
 <template>
   <footer>
     <div class="py-6 text-center" :class="{ 'text-gray-300': imgLoaded }">
-      <p>&copy; 2025 Nietzschess. All rights reserved.</p>
+      <p>&copy; {{ currentYear }} Nietzschess. All rights reserved.</p>
       <div class="flex justify-center gap-4 mt-2">
         <ULink to="/terms" :class="{ 'text-gray-300': imgLoaded }">Terms of Service</ULink>
         <ULink to="/privacy" :class="{ 'text-gray-300': imgLoaded }">Privacy Policy</ULink>

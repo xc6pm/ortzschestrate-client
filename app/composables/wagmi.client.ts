@@ -72,10 +72,9 @@ const initWagmi = (projectId: string): WagmiProps => {
 }
 
 export const useWagmi = () => {
-  const projectId = useRuntimeConfig().public.reownProjectId
-  if (!projectId) throw new Error("The wallet button requires a reown project id to work.")
-
   if (!wagmiProps) {
+    const projectId = useRuntimeConfig().public.reownProjectId
+    if (!projectId) throw new Error("The wallet button requires a reown project id to work.")
     wagmiProps = initWagmi(projectId)
   }
 

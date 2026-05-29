@@ -3,26 +3,33 @@ import UserButton from "~/components/auth/UserButton.vue"
 import WalletButton from "~/components/wallet/WalletButton.vue"
 
 const userStore = useUserStore()
+const { isMobile } = useIsMobile()
+
+const headerItems = [
+  {
+    label: "Shop",
+    to: "/shop",
+    class: !isMobile ? "text-white hover:text-green-400 transition-colors font-medium" : "text-black",
+  },
+]
 </script>
 
 <template>
-  <header class="bg-gray-800 text-white py-4 shadow-md">
-    <UContainer class="max-w-7xl mx-auto px-4 flex justify-between items-center">
+  <UHeader :ui="{ root: 'bg-gray-800 text-white shadow-md' }" mode="drawer">
+    <template #title>
       <NuxtLink to="/"><span class="text-3xl font-bold text-green-400">nietzschess</span></NuxtLink>
+    </template>
 
-      <div class="relative flex flex-row gap-3">
-        <NuxtLink to="/shop" class="text-white hover:text-green-400 transition-colors font-medium mt-1 mr-1">
-          Shop
-        </NuxtLink>
+    <UNavigationMenu :items="headerItems" />
 
-        <ClientOnly>
-          <WalletButton v-if="userStore.user" />
+    <template #right>
+      <ClientOnly>
+        <!-- <WalletButton v-if="userStore.user" /> -->
 
-          <UserButton />
-        </ClientOnly>
-      </div>
-    </UContainer>
-  </header>
+        <UserButton />
+      </ClientOnly>
+    </template>
+  </UHeader>
 
   <UContainer class="max-w-7xl mx-auto px-4">
     <slot />

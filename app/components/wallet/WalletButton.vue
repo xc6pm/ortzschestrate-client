@@ -6,6 +6,6 @@ const account = useAccount()
 </script>
 
 <template>
-  <appkit-connect-button v-if="!account.isConnected.value" size="sm" color="oxford-blue" />
+  <appkit-connect-button v-if="!account.isConnected.value" size="sm" class="text-white hover:text-green-400 transition-colors font-medium dark" />
   <AccountButton v-else />
 </template>
