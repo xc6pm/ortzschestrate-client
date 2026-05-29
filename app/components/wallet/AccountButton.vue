@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { FormError } from "@nuxt/ui"
+import type { DropdownMenuItem, FormError } from "@nuxt/ui"
 import { useAccount, useWriteContract } from "@wagmi/vue"
-import { parseEther, type Hex } from "viem"
+import { isAddressEqual, parseEther, type Hex } from "viem"
 import { useContractStateStore } from "~/stores/contractState.client"
 
 const account = useAccount()
@@ -53,6 +53,7 @@ const amountEntered = async () => {
 }
 
 const userStore = useUserStore()
+const { isMobile } = useIsMobile()
 const walletVerified = computed(() => account.address.value === (userStore.user?.verifiedWallet as Hex))
 const toast = useToast()
 
@@ -69,50 +70,44 @@ const verifyWallet = async () => {
   await userStore.fetch()
 }
 
-const dropdownItems = ref([
-  [
-    {
-      label: "deposit",
-      onSelect: () => {
-        modalState.amount = 0
-        isDepositModal = true
-        isModalOpen.value = true
-      },
-    },
-    {
-      label: "withdraw",
-      onSelect: () => {
-        modalState.amount = 0
-        isDepositModal = false
-        isModalOpen.value = true
-      },
-    },
-    {
-      label: "disconnect",
-      onSelect: () => {
-        wagmiAdapter.disconnect({ id: account.address.value })
-      },
-    },
-  ],
-])
-
-const invalidateVerifyButton = () => {
-  if (!walletVerified.value && dropdownItems.value[0]![0]!.label !== "verify") {
-    dropdownItems.value[0] = [
+const dropdownItems = computed(() => {
+  const items: DropdownMenuItem[] = [
+    [
       {
-        label: "verify",
-        onSelect: () => verifyWallet(),
+        label: "deposit",
+        onSelect: () => {
+          modalState.amount = 0
+          isDepositModal = true
+          isModalOpen.value = true
+        },
       },
-      ...dropdownItems.value[0]!,
-    ]
-  } else if (dropdownItems.value[0]!.find((item) => item?.label === "verify")) {
-    dropdownItems.value[0]!.splice(0, 1)
+      {
+        label: "withdraw",
+        onSelect: () => {
+          modalState.amount = 0
+          isDepositModal = false
+          isModalOpen.value = true
+        },
+      },
+      {
+        label: "disconnect",
+        onSelect: () => {
+          wagmiAdapter.disconnect({ id: account.address.value })
+        },
+      },
+    ],
+  ]
+
+  if (!userStore.user?.verifiedWallet || !isAddressEqual(account.address.value!, userStore.user.verifiedWallet)) {
+    items[0]!.unshift({ label: "verify", onSelect: () => verifyWallet() })
   }
-}
 
-watch(walletVerified, invalidateVerifyButton)
+  if (isMobile) {
+    items[0]!.unshift({ label: `${shortenHex(account.address.value, 5, 4)} (${contractState.stakesEth} POL)` })
+  }
 
-invalidateVerifyButton()
+  return items
+})
 
 const errors = ref<FormError<string>[]>([])
 const validate = (state: Partial<{ amount: number }>): FormError<string>[] => {
@@ -192,14 +187,14 @@ const transactionItems = computed(() => {
 <template>
   <div class="flex">
     <UDropdownMenu :items="dropdownItems">
-      <UButton color="tertiary" class="text-slate-200 rounded-r-none">
-        {{ account.address.value?.substring(0, 5) }}...{{
-          account.address.value?.substring(account.address.value.length - 4, account.address.value.length)
-        }}
-        ({{ contractState.stakesEth }} POL)
-      </UButton>
+      <UButton
+        :label="isMobile ? undefined : `${shortenHex(account.address.value, 5, 4)} (${contractState.stakesEth} POL)`"
+        :icon="isMobile ? 'i-mdi-wallet' : undefined"
+        color="tertiary"
+        :class="`text-slate-200 ${!isMobile ? 'rounded-r-none' : ''}`"
+      />
     </UDropdownMenu>
-    <UDropdownMenu :items="transactionItems" v-model:open="txDropdownOpen">
+    <UDropdownMenu v-if="!isMobile" :items="transactionItems" v-model:open="txDropdownOpen">
       <div class="relative">
         <UButton
           color="tertiary"

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 const props = defineProps<{
-  movesPlayed: string[],
+  movesPlayed: string[]
   showResignButton: boolean
 }>()
 
@@ -14,7 +14,7 @@ const resign = async () => {
 </script>
 
 <template>
-  <UCard class="flex flex-col h-full" :ui="{ root: 'flex md:flex', body: 'flex-1' }">
+  <UCard class="flex flex-col h-full" :ui="{ root: 'flex md:flex', body: 'flex-1 overflow-y-auto' }">
     <table class="w-full text-left overflow-y-auto block table-fixed">
       <tbody class="block">
         <tr v-for="(pair, index) in movePairs" :key="index" class="flex flex-row">
