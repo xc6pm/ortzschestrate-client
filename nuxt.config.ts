@@ -42,6 +42,7 @@ export default defineNuxtConfig({
       include: [
         "@microsoft/signalr",
         "@reown/appkit-adapter-wagmi",
+        "@reown/appkit-wallet",
         "@reown/appkit/vue",
         "@tanstack/vue-query",
         "@wagmi/vue",
@@ -56,10 +57,14 @@ export default defineNuxtConfig({
         "vue-demi": "vue-demi/lib/v3/index.mjs",
       },
     },
+    ssr: {
+      noExternal: ["@walletconnect/logger", "@reown/appkit-wallet"],
+    },
   },
 build: {
     transpile: [
       "@walletconnect/logger",
+      "@reown/appkit-wallet",
       "@walletconnect/utils",
       "@walletconnect/core",
       "@walletconnect/sign-client",
@@ -91,7 +96,7 @@ build: {
       },
     ],
     externals: {
-      inline: ["@walletconnect/logger", "@walletconnect/utils", "@walletconnect/core"],
+      inline: ["@walletconnect/logger", "@reown/appkit-wallet", "@walletconnect/utils", "@walletconnect/core"],
     },
   },
 })
