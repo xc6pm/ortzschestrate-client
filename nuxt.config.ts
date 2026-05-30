@@ -39,7 +39,17 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      include: ["eventemitter3"],
+      include: [
+        "@microsoft/signalr",
+        "@reown/appkit-adapter-wagmi",
+        "@reown/appkit/vue",
+        "@tanstack/vue-query",
+        "@wagmi/vue",
+        "@wagmi/vue/connectors",
+        "eventemitter3",
+        "viem",
+        "viem/chains",
+      ],
     },
     resolve: {
       alias: {
