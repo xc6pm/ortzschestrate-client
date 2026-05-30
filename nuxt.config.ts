@@ -90,5 +90,8 @@ build: {
         dir: "public/deployment",
       },
     ],
+    externals: {
+      inline: ["@walletconnect/logger", "@walletconnect/utils", "@walletconnect/core"],
+    },
   },
 })
