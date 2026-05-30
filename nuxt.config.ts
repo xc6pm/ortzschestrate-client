@@ -57,10 +57,20 @@ export default defineNuxtConfig({
       },
     },
   },
+build: {
+    transpile: [
+      "@walletconnect/logger",
+      "@walletconnect/utils",
+      "@walletconnect/core",
+      "@walletconnect/sign-client",
+      "@walletconnect/jsonrpc-utils",
+      "@walletconnect/types",
+    ],
+  },
 
   vue: {
     compilerOptions: {
-      isCustomElement: (tag) => ["appkit-connect-button", "piece"].includes(tag),
+      isCustomElement: (tag: any) => ["appkit-connect-button", "piece"].includes(tag),
     },
   },
 
