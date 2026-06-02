@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { isr: true },
     "/**": { isr: true },
-    "/auth/**": { ssr: false },
+    "/login": { ssr: false },
     "/game/**": { ssr: false },
     "/history/**": { isr: true },
     "/shop/**": { isr: true },
