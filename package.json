@@ -20,7 +20,6 @@
     "@reown/appkit": "^1.6.8",
     "@reown/appkit-adapter-wagmi": "^1.8.20",
     "@tanstack/vue-query": "^5.66.0",
-    "@types/node": "22.15.1",
     "@wagmi/vue": "^0.5.17",
     "eventemitter3": "5.0.0",
     "graphql": "^16.12.0",
@@ -34,6 +33,7 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.110",
     "@iconify-json/mdi": "^1.2.3",
+    "@types/node": "22.15.1",
     "@vue/devtools-api": "6.6.3",
     "@vueuse/nuxt": "13.1.0",
     "baseline-browser-mapping": "^2.9.11",
@@ -41,5 +41,5 @@
     "typescript": "^5.8.2",
     "vercel": "^54.5.0"
   },
-  "packageManager": "pnpm@10.18.3+sha512.bbd16e6d7286fd7e01f6b3c0b3c932cda2965c06a908328f74663f10a9aea51f1129eea615134bf992831b009eabe167ecb7008b597f40ff9bc75946aadfb08d"
+  "packageManager": "pnpm@11.5.0+sha512.dbfcc4f81cf48597afd4bc391ffdf12c11f1a9fb83a395bfa6b0a2d9cc2fd8ffebafdb1ccbd529632153f793904c2615b7f09fe1a345473fd1c35845172a8eb1"
 }

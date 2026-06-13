@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { isr: true },
     "/**": { isr: true },
-    "/auth/**": { ssr: false },
+    "/login": { ssr: false },
     "/game/**": { ssr: false },
     "/history/**": { isr: true },
     "/shop/**": { isr: true },
@@ -39,18 +39,43 @@ export default defineNuxtConfig({
 
   vite: {
     optimizeDeps: {
-      include: ["eventemitter3"],
+      include: [
+        "@microsoft/signalr",
+        "@reown/appkit-adapter-wagmi",
+        "@reown/appkit-wallet",
+        "@reown/appkit/vue",
+        "@tanstack/vue-query",
+        "@wagmi/vue",
+        "@wagmi/vue/connectors",
+        "eventemitter3",
+        "viem",
+        "viem/chains",
+      ],
     },
     resolve: {
       alias: {
         "vue-demi": "vue-demi/lib/v3/index.mjs",
       },
     },
+    ssr: {
+      noExternal: ["@walletconnect/logger", "@reown/appkit-wallet"],
+    },
+  },
+build: {
+    transpile: [
+      "@walletconnect/logger",
+      "@reown/appkit-wallet",
+      "@walletconnect/utils",
+      "@walletconnect/core",
+      "@walletconnect/sign-client",
+      "@walletconnect/jsonrpc-utils",
+      "@walletconnect/types",
+    ],
   },
 
   vue: {
     compilerOptions: {
-      isCustomElement: (tag) => ["appkit-connect-button", "piece"].includes(tag),
+      isCustomElement: (tag: any) => ["appkit-connect-button", "piece"].includes(tag),
     },
   },
 
@@ -70,5 +95,8 @@ export default defineNuxtConfig({
         dir: "public/deployment",
       },
     ],
+    externals: {
+      inline: ["@walletconnect/logger", "@reown/appkit-wallet", "@walletconnect/utils", "@walletconnect/core"],
+    },
   },
 })
